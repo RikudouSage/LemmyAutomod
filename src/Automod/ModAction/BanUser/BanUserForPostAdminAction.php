@@ -34,6 +34,10 @@ final readonly class BanUserForPostAdminAction extends AbstractBanUserModAction
 
     public function takeAction(object $object, array $previousActions = []): FurtherAction
     {
+        if ($object->creatorIsAdmin || $object->creator->admin) {
+            // do nothing, but the top admin will still be notified
+            return FurtherAction::ShouldAbort;
+        }
         foreach ($this->getTextsToCheck($object) as $text) {
             if (!$rule = $this->findMatchingRule($text)) {
                 continue;
