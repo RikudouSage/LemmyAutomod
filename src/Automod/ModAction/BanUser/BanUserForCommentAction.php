@@ -2,6 +2,7 @@
 
 namespace App\Automod\ModAction\BanUser;
 
+use App\Helper\TextsHelper;
 use Rikudou\LemmyApi\Response\View\CommentView;
 
 /**
@@ -16,6 +17,6 @@ final readonly class BanUserForCommentAction extends AbstractBanUserModAction
 
     protected function getTextsToCheck(object $object): array
     {
-        return [$object->comment->content, $object->creator->name, $object->creator->displayName];
+        return TextsHelper::getCommentTextsToCheck($object);
     }
 }

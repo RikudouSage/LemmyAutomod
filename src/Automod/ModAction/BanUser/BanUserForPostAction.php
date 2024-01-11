@@ -4,6 +4,7 @@ namespace App\Automod\ModAction\BanUser;
 
 use App\Entity\InstanceBanRegex;
 use App\Enum\FurtherAction;
+use App\Helper\TextsHelper;
 use App\Repository\InstanceBanRegexRepository;
 use Rikudou\LemmyApi\Response\View\PostView;
 
@@ -23,6 +24,6 @@ final readonly class BanUserForPostAction extends AbstractBanUserModAction
 
     protected function getTextsToCheck(object $object): array
     {
-        return [$object->post->name, $object->post->body, $object->post->url, $object->creator->name, $object->creator->displayName];
+        return TextsHelper::getPostTextsToCheck($object);
     }
 }
