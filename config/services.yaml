@@ -4,6 +4,10 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    app.lemmy.user: '%env(LEMMY_USER)%'
+    app.lemmy.password: '%env(LEMMY_PASSWORD)%'
+    app.lemmy.instance: '%env(LEMMY_INSTANCE)%'
+    app.lemmy.notify_admin: '%env(LEMMY_ADMIN_TO_NOTIFY)%'
 
 services:
     # default configuration for services in *this* file
@@ -22,3 +26,18 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    app.lemmy.version:
+        class: Rikudou\LemmyApi\Enum\LemmyApiVersion
+        factory: [Rikudou\LemmyApi\Enum\LemmyApiVersion, from]
+        arguments:
+            - 'v3'
+
+    Rikudou\LemmyApi\DefaultLemmyApi:
+        arguments:
+            $instanceUrl: '%app.lemmy.instance%'
+            $version: '@app.lemmy.version'
+        calls:
+            - login: ['%app.lemmy.user%', '%app.lemmy.password%']
+
+    Rikudou\LemmyApi\LemmyApi: '@Rikudou\LemmyApi\DefaultLemmyApi'
