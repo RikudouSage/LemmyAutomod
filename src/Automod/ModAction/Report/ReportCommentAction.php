@@ -10,6 +10,11 @@ use Rikudou\LemmyApi\Response\View\CommentView;
  */
 final readonly class ReportCommentAction extends AbstractReportAction
 {
+    public function shouldRun(object $object): bool
+    {
+        return $object instanceof CommentView && parent::shouldRun($object);
+    }
+
     protected function getTextsToCheck(object $object): array
     {
         return TextsHelper::getCommentTextsToCheck($object);

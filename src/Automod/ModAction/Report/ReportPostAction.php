@@ -5,6 +5,7 @@ namespace App\Automod\ModAction\Report;
 use App\Automod\ModAction\AbstractModAction;
 use App\Enum\FurtherAction;
 use App\Helper\TextsHelper;
+use Rikudou\LemmyApi\Response\View\CommentView;
 use Rikudou\LemmyApi\Response\View\PostView;
 
 /**
@@ -12,6 +13,11 @@ use Rikudou\LemmyApi\Response\View\PostView;
  */
 final readonly class ReportPostAction extends AbstractReportAction
 {
+    public function shouldRun(object $object): bool
+    {
+        return $object instanceof PostView && parent::shouldRun($object);
+    }
+
     protected function getTextsToCheck(object $object): array
     {
         return TextsHelper::getPostTextsToCheck($object);
