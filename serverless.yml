@@ -45,6 +45,7 @@ functions:
     web:
         handler: public/index.php
         timeout: 28 # in seconds (API Gateway has a timeout of 29 seconds)
+        memorySize: 256
         layers:
             - ${bref:layer.php-83-fpm}
         events:
@@ -52,6 +53,7 @@ functions:
     worker:
         handler: bin/consumer.php
         timeout: 240 # in seconds
+        memorySize: 256
         reservedConcurrency: 5 # max. 5 messages processed in parallel
         layers:
             - ${bref:layer.php-83}
