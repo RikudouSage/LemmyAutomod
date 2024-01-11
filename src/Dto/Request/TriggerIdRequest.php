@@ -2,7 +2,7 @@
 
 namespace App\Dto\Request;
 
-final readonly class TriggerPostRequest
+final readonly class TriggerIdRequest
 {
     public function __construct(
         public int $id,
