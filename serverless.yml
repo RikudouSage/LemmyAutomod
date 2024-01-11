@@ -6,11 +6,36 @@ provider:
     # The AWS region in which to deploy (us-east-1 is the default)
     region: eu-central-1
     # The stage of the application, e.g. dev, production, staging… ('dev' is the default)
-    stage: dev
+    stage: ${opt:stage, 'dev'}
     runtime: provided.al2
+    stackTags:
+        BillingProject: LemmyAutomod
+    iam:
+        role:
+            statements:
+                - Effect: Allow
+                  Resource:
+                      - !GetAtt CacheTable.Arn
+                  Action:
+                      - dynamodb:DescribeTable
+                      - dynamodb:Query
+                      - dynamodb:Scan
+                      - dynamodb:GetItem
+                      - dynamodb:PutItem
+                      - dynamodb:UpdateItem
+                      - dynamodb:DeleteItem
+                - Effect: Allow
+                  Resource:
+                      - !GetAtt Queue.Arn
+                      - !GetAtt DeadLetterQueue.Arn
+                  Action:
+                      - sqs:*
     environment:
         # Symfony environment variables
-        APP_ENV: prod
+        APP_ENV: ${self:provider.stage}
+        APP_SECRET: !Join ['', ['{{resolve:secretsmanager:', !Ref AppSecret, ':SecretString:secret}}']]
+        DYNAMODB_CACHE_TABLE: !Ref CacheTable
+        MESSENGER_TRANSPORT_DSN: !Join ['', [!Ref Queue, '?auto_setup=false']]
 
 plugins:
     - ./vendor/bref/bref
@@ -21,16 +46,68 @@ functions:
         handler: public/index.php
         timeout: 28 # in seconds (API Gateway has a timeout of 29 seconds)
         layers:
-            - ${bref:layer.php-81-fpm}
+            - ${bref:layer.php-83-fpm}
         events:
             - httpApi: '*'
+    worker:
+        handler: bin/consumer.php
+        timeout: 240 # in seconds
+        reservedConcurrency: 5 # max. 5 messages processed in parallel
+        layers:
+            - ${bref:layer.php-83}
+        events:
+            # Read more at https://www.serverless.com/framework/docs/providers/aws/events/sqs/
+            - sqs:
+                  arn: !GetAtt Queue.Arn
+                  # Only 1 item at a time to simplify error handling
+                  batchSize: 1
     # This function let us run console commands in Lambda
     console:
         handler: bin/console
         timeout: 120 # in seconds
         layers:
-            - ${bref:layer.php-81} # PHP
+            - ${bref:layer.php-83} # PHP
             - ${bref:layer.console} # The "console" layer
+
+resources:
+    Resources:
+        CacheTable:
+            Type: AWS::DynamoDB::Table
+            Properties:
+                AttributeDefinitions:
+                    - AttributeName: id
+                      AttributeType: S
+                BillingMode: PAY_PER_REQUEST
+                TimeToLiveSpecification:
+                    AttributeName: ttl
+                    Enabled: true
+                KeySchema:
+                    - AttributeName: id
+                      KeyType: HASH
+        AppSecret:
+            Type: AWS::SecretsManager::Secret
+            Properties:
+                Description: Lemmy Automod service app secret
+                GenerateSecretString:
+                    SecretStringTemplate: "{}"
+                    GenerateStringKey: secret
+                    PasswordLength: 32
+                    RequireEachIncludedType: true
+                    ExcludeUppercase: true
+                    ExcludePunctuation: true
+                    ExcludeCharacters: ghijklmnopqrstuvwxyz
+        Queue:
+            Type: AWS::SQS::Queue
+            Properties:
+                VisibilityTimeout: 1440
+                RedrivePolicy:
+                    deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+                    maxReceiveCount: 5
+        DeadLetterQueue:
+            Type: AWS::SQS::Queue
+            Properties:
+                MessageRetentionPeriod: 1209600
+
 
 package:
     patterns:
