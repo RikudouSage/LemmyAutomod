@@ -5,17 +5,23 @@ namespace App\Automod\ModAction\BanUser;
 use App\Automod\ModAction\AbstractModAction;
 use App\Entity\InstanceBanRegex;
 use App\Enum\FurtherAction;
+use App\Message\RemovePostMessage;
 use App\Repository\InstanceBanRegexRepository;
+use Rikudou\LemmyApi\Enum\SortType;
 use Rikudou\LemmyApi\Response\Model\Person;
+use Rikudou\LemmyApi\Response\View\CommentView;
+use Rikudou\LemmyApi\Response\View\PostView;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
- * @template TObject of object
+ * @template TObject of PostView|CommentView
  * @extends AbstractModAction<TObject>
  */
 abstract readonly class AbstractBanUserModAction extends AbstractModAction
 {
     private InstanceBanRegexRepository $banRegexRepository;
+    private MessageBusInterface $messageBus;
 
     public function getDescription(): ?string
     {
@@ -44,7 +50,11 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
                 continue;
             }
 
-            $this->api->admin()->banUser(user: $object->creator, reason: $rule->getReason());
+            $removePosts = !$object->creator->local;
+            $this->api->admin()->banUser(user: $object->creator, reason: $rule->getReason(), removeData: $removePosts);
+            if ($object->creator->local) {
+                $this->deletePostsFederated($object->creator);
+            }
             break;
         }
 
@@ -81,5 +91,23 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
     public function setRegexRepository(InstanceBanRegexRepository $banRegexRepository): void
     {
         $this->banRegexRepository = $banRegexRepository;
+    }
+
+    #[Required]
+    public function setMessageBus(MessageBusInterface $messageBus): void
+    {
+        $this->messageBus = $messageBus;
+    }
+
+    private function deletePostsFederated(Person $user): void
+    {
+        $page = 1;
+        do {
+            $posts = $this->api->user()->getPosts($user, page: $page, sort: SortType::New);
+            foreach ($posts as $post) {
+                $this->messageBus->dispatch(new RemovePostMessage($post->post->id));
+            }
+            ++$page;
+        } while (count($posts));
     }
 }

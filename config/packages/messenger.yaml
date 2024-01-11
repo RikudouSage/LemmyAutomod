@@ -12,6 +12,7 @@ framework:
         routing:
             App\Message\AnalyzePostMessage: async
             App\Message\AnalyzeCommentMessage: async
+            App\Message\RemovePostMessage: async
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
 
