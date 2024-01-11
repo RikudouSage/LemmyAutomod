@@ -33,14 +33,9 @@ services:
         arguments:
             - 'v3'
 
-    Rikudou\LemmyApi\DefaultLemmyApi:
-        arguments:
-            $instanceUrl: '%app.lemmy.instance%'
-            $version: '@app.lemmy.version'
-        calls:
-            - login: ['%app.lemmy.user%', '%app.lemmy.password%']
-
-    Rikudou\LemmyApi\LemmyApi: '@Rikudou\LemmyApi\DefaultLemmyApi'
+    Rikudou\LemmyApi\LemmyApi:
+        class: Rikudou\LemmyApi\DefaultLemmyApi
+        factory: ['@App\Service\LemmyApiFactory', 'createApi']
 
     Bref\Symfony\Messenger\Service\Sqs\SqsConsumer:
         public: true
