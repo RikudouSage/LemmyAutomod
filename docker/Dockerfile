@@ -24,4 +24,14 @@ RUN mkdir /opt/database && \
     chown 33:33 /opt/* && \
     chmod +x /var/www/html/docker/entrypoint.bash
 
+WORKDIR /var/www/html
+RUN wget https://getcomposer.org/installer -O /tmp/composer-installer && \
+    php /tmp/composer-installer && \
+    chmod +x composer.phar && \
+    mv composer.phar /usr/local/bin/composer && \
+    rm -rf var vendor && \
+    composer install --no-dev --no-scripts -o -a && \
+    rm -rf /usr/local/bin/composer && \
+    rm -rf /tmp/composer-installer
+
 ENTRYPOINT ["/usr/bin/tini", "--", "/var/www/html/docker/entrypoint.bash"]
