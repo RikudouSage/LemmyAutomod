@@ -7,7 +7,7 @@ parameters:
     app.lemmy.user: '%env(LEMMY_USER)%'
     app.lemmy.password: '%env(LEMMY_PASSWORD)%'
     app.lemmy.instance: '%env(LEMMY_INSTANCE)%'
-    app.lemmy.notify_admin: '%env(LEMMY_ADMIN_TO_NOTIFY)%'
+    app.lemmy.notify_admins: '%env(csv:LEMMY_ADMINS_TO_NOTIFY)%'
 
 services:
     # default configuration for services in *this* file

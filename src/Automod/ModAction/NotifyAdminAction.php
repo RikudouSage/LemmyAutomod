@@ -17,10 +17,13 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 #[AsTaggedItem(priority: -1_000_000)]
 final readonly class NotifyAdminAction implements ModAction
 {
+    /**
+     * @param array<string> $adminsToNotify
+     */
     public function __construct(
         private LemmyApi $api,
         #[Autowire('%app.lemmy.notify_admin%')]
-        private string $adminToNotify,
+        private array $adminsToNotify,
         #[Autowire('%app.lemmy.instance%')]
         private string $instance,
         private InstanceLinkConverter $linkConverter,
@@ -34,7 +37,7 @@ final readonly class NotifyAdminAction implements ModAction
 
     public function takeAction(object $object, array $previousActions = []): FurtherAction
     {
-        if (!$this->adminToNotify) {
+        if (!$this->adminsToNotify) {
             return FurtherAction::CanContinue;
         }
         if (!count($previousActions)) {
@@ -57,10 +60,12 @@ final readonly class NotifyAdminAction implements ModAction
             $message .= " - {$actionName}\n";
         }
 
-        $this->api->currentUser()->sendPrivateMessage(
-            $this->api->user()->get($this->adminToNotify),
-            $message,
-        );
+        foreach ($this->adminsToNotify as $adminUsername) {
+            $this->api->currentUser()->sendPrivateMessage(
+                $this->api->user()->get($adminUsername),
+                $message,
+            );
+        }
 
         return FurtherAction::CanContinue;
     }
