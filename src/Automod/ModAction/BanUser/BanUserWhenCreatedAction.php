@@ -18,4 +18,9 @@ final readonly class BanUserWhenCreatedAction extends AbstractBanUserModAction
     {
         return [$object->name, $object->displayName, $object->matrixUserId];
     }
+
+    protected function getAuthor(object $object): Person
+    {
+        return $object;
+    }
 }

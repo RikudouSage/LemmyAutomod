@@ -3,6 +3,7 @@
 namespace App\Automod\ModAction\BanUser;
 
 use App\Helper\TextsHelper;
+use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentView;
 
 /**
@@ -18,5 +19,10 @@ final readonly class BanUserForCommentAction extends AbstractBanUserModAction
     protected function getTextsToCheck(object $object): array
     {
         return TextsHelper::getCommentTextsToCheck($object);
+    }
+
+    protected function getAuthor(object $object): Person
+    {
+        return $object->creator;
     }
 }
