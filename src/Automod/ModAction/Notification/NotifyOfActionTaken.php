@@ -65,7 +65,7 @@ final readonly class NotifyOfActionTaken implements ModAction
             $message .= " - {$actionName}\n";
         }
 
-        $this->notificationSender->sendNotification($message);
+        $this->notificationSender->sendNotificationAsync($message);
         return FurtherAction::CanContinue;
     }
 

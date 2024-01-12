@@ -33,7 +33,7 @@ final readonly class NotifyOnNewLocalUser implements ModAction
 
     public function takeAction(object $object, array $previousActions = []): FurtherAction
     {
-        $this->notificationSender->sendNotification(
+        $this->notificationSender->sendNotificationAsync(
             "New user has been added: [{$object->name}](https://{$this->instance}/u/{$object->name})",
         );
 

@@ -2,8 +2,10 @@
 
 namespace App\Service\Notification;
 
+use App\Message\SendNotificationAsyncMessage;
 use App\Service\Notification\NotificationChannel;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final readonly class NotificationSender
 {
@@ -13,6 +15,7 @@ final readonly class NotificationSender
     public function __construct(
         #[TaggedIterator('app.notification.channel')]
         private iterable $channels,
+        private MessageBusInterface $messageBus,
     ) {
     }
 
@@ -25,6 +28,11 @@ final readonly class NotificationSender
 
             $channel->notify($message);
         }
+    }
+
+    public function sendNotificationAsync(string $message): void
+    {
+        $this->messageBus->dispatch(new SendNotificationAsyncMessage($message));
     }
 
     public function hasEnabledChannels(): bool

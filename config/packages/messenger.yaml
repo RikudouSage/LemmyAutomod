@@ -14,6 +14,7 @@ framework:
             App\Message\AnalyzeCommentMessage: async
             App\Message\RemovePostMessage: async
             App\Message\AnalyzeUserMessage: async
+            App\Message\SendNotificationAsyncMessage: async
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
 
