@@ -10,7 +10,7 @@ use Rikudou\LemmyApi\Response\View\PostView;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
- * @template TObject of (PostView|CommentView)
+ * @template TObject of (PostView|CommentView|Person)
  * @implements ModAction<TObject>
  */
 abstract readonly class AbstractModAction implements ModAction

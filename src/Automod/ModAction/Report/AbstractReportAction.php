@@ -3,10 +3,8 @@
 namespace App\Automod\ModAction\Report;
 
 use App\Automod\ModAction\AbstractModAction;
-use App\Entity\InstanceBanRegex;
 use App\Entity\ReportRegex;
 use App\Enum\FurtherAction;
-use App\Repository\InstanceBanRegexRepository;
 use App\Repository\ReportRegexRepository;
 use Rikudou\LemmyApi\Response\View\CommentView;
 use Rikudou\LemmyApi\Response\View\PostView;
@@ -39,6 +37,9 @@ abstract readonly class AbstractReportAction extends AbstractModAction
 
     public function shouldRun(object $object): bool
     {
+        if (!$object instanceof PostView && !$object instanceof CommentView) {
+            return false;
+        }
         foreach ($this->getTextsToCheck($object) as $text) {
             if ($this->findMatchingRule($text)) {
                 return true;

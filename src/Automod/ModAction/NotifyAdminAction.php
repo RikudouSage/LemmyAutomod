@@ -6,13 +6,14 @@ use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
 use App\Service\InstanceLinkConverter;
 use Rikudou\LemmyApi\LemmyApi;
+use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * @implements ModAction<CommentView|PostView>
+ * @implements ModAction<CommentView|PostView|Person>
  */
 #[AsTaggedItem(priority: -1_000_000)]
 final readonly class NotifyAdminAction implements ModAction
@@ -22,7 +23,7 @@ final readonly class NotifyAdminAction implements ModAction
      */
     public function __construct(
         private LemmyApi $api,
-        #[Autowire('%app.lemmy.notify_admin%')]
+        #[Autowire('%app.lemmy.notify_admins%')]
         private array $adminsToNotify,
         #[Autowire('%app.lemmy.instance%')]
         private string $instance,
@@ -32,7 +33,7 @@ final readonly class NotifyAdminAction implements ModAction
 
     public function shouldRun(object $object): bool
     {
-        return $object instanceof CommentView || $object instanceof PostView;
+        return $object instanceof CommentView || $object instanceof PostView || $object instanceof Person;
     }
 
     public function takeAction(object $object, array $previousActions = []): FurtherAction
@@ -47,6 +48,14 @@ final readonly class NotifyAdminAction implements ModAction
         $target = null;
         if ($object instanceof PostView) {
             $target = $this->linkConverter->convertPostLink($object->post);
+        } elseif ($object instanceof CommentView) {
+            $target = $this->linkConverter->convertCommentLink($object->comment);
+        } elseif ($object instanceof Person) {
+            $target = $this->linkConverter->convertPersonLink($object);
+        }
+
+        if ($target === null) {
+            return FurtherAction::CanContinue;
         }
 
         $actionNames = array_map(

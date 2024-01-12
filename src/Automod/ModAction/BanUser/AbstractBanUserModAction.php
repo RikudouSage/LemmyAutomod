@@ -15,7 +15,7 @@ use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
- * @template TObject of (PostView|CommentView)
+ * @template TObject of (PostView|CommentView|Person)
  * @extends AbstractModAction<TObject>
  */
 abstract readonly class AbstractBanUserModAction extends AbstractModAction

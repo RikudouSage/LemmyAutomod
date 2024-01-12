@@ -5,6 +5,7 @@ namespace App\Automod;
 use App\Automod\ModAction\ModAction;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
+use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
@@ -20,7 +21,7 @@ final readonly class Automod
     ) {
     }
 
-    public function analyze(PostView|CommentView $object): void
+    public function analyze(PostView|CommentView|Person $object): void
     {
         $furtherAction = FurtherAction::CanContinue;
         $previousActions = [];
