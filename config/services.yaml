@@ -7,8 +7,11 @@ parameters:
     app.lemmy.user: '%env(LEMMY_USER)%'
     app.lemmy.password: '%env(LEMMY_PASSWORD)%'
     app.lemmy.instance: '%env(LEMMY_INSTANCE)%'
+
     app.lemmy.notify_users: '%env(csv:LEMMY_USERS_TO_NOTIFY)%'
     app.notify.new_users: '%env(bool:ENABLE_NEW_USERS_NOTIFICATION)%'
+    app.notify.slack.token: '%env(SLACK_BOT_TOKEN)%'
+    app.notify.slack.channels: '%env(csv:SLACK_CHANNELS)%'
 
 services:
     # default configuration for services in *this* file
