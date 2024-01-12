@@ -25,7 +25,7 @@ RUN mkdir /opt/database && \
     chmod +x /var/www/html/docker/entrypoint.bash
 
 WORKDIR /var/www/html
-RUN wget https://getcomposer.org/installer -O /tmp/composer-installer && \
+RUN curl https://getcomposer.org/installer -o /tmp/composer-installer && \
     php /tmp/composer-installer && \
     chmod +x composer.phar && \
     mv composer.phar /usr/local/bin/composer && \
