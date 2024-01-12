@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Automod\ModAction;
+namespace App\Automod\ModAction\Notification;
 
+use App\Automod\ModAction\ModAction;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
 use App\Service\InstanceLinkConverter;
