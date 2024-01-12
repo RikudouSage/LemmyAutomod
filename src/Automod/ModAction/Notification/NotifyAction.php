@@ -6,7 +6,7 @@ use App\Automod\ModAction\ModAction;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
 use App\Service\InstanceLinkConverter;
-use Rikudou\LemmyApi\LemmyApi;
+use App\Service\Notification\NotificationSender;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentView;
 use Rikudou\LemmyApi\Response\View\PostView;
@@ -17,31 +17,25 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * @implements ModAction<CommentView|PostView|Person>
  */
 #[AsTaggedItem(priority: -1_000_000)]
-final readonly class NotifyAdminAction implements ModAction
+final readonly class NotifyAction implements ModAction
 {
-    /**
-     * @param array<string> $adminsToNotify
-     */
     public function __construct(
-        private LemmyApi $api,
-        #[Autowire('%app.lemmy.notify_admins%')]
-        private array $adminsToNotify,
         #[Autowire('%app.lemmy.instance%')]
         private string $instance,
         private InstanceLinkConverter $linkConverter,
+        private NotificationSender $notificationSender,
     ) {
     }
 
     public function shouldRun(object $object): bool
     {
-        return $object instanceof CommentView || $object instanceof PostView || $object instanceof Person;
+        return ($object instanceof CommentView || $object instanceof PostView || $object instanceof Person)
+            && $this->notificationSender->hasEnabledChannels()
+        ;
     }
 
     public function takeAction(object $object, array $previousActions = []): FurtherAction
     {
-        if (!$this->adminsToNotify) {
-            return FurtherAction::CanContinue;
-        }
         if (!count($previousActions)) {
             return FurtherAction::CanContinue;
         }
@@ -70,13 +64,7 @@ final readonly class NotifyAdminAction implements ModAction
             $message .= " - {$actionName}\n";
         }
 
-        foreach ($this->adminsToNotify as $adminUsername) {
-            $this->api->currentUser()->sendPrivateMessage(
-                $this->api->user()->get($adminUsername),
-                $message,
-            );
-        }
-
+        $this->notificationSender->sendNotification($message);
         return FurtherAction::CanContinue;
     }
 
