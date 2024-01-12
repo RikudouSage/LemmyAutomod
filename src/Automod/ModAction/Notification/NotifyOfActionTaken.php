@@ -2,6 +2,7 @@
 
 namespace App\Automod\ModAction\Notification;
 
+use App\Automod\Enum\AutomodPriority;
 use App\Automod\ModAction\ModAction;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
@@ -16,8 +17,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 /**
  * @implements ModAction<CommentView|PostView|Person>
  */
-#[AsTaggedItem(priority: -1_000_000)]
-final readonly class NotifyAction implements ModAction
+#[AsTaggedItem(priority: AutomodPriority::Notification->value)]
+final readonly class NotifyOfActionTaken implements ModAction
 {
     public function __construct(
         #[Autowire('%app.lemmy.instance%')]
