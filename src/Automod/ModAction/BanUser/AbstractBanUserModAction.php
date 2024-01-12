@@ -102,7 +102,7 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
         $regexes = $this->banRegexRepository->findAll();
         foreach ($regexes as $regexEntity) {
             $regex = str_replace('@', '\\@', $regexEntity->getRegex());
-            $regex = "@{$regex}@";
+            $regex = "@{$regex}@i";
             if (!preg_match($regex, $content)) {
                 continue;
             }
@@ -122,7 +122,7 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
         $bannedUsernames = $this->usernameRepository->findAll();
         foreach ($bannedUsernames as $bannedUsername) {
             $regex = str_replace('@', '\\@', $bannedUsername->getUsername());
-            $regex = "@{$regex}@";
+            $regex = "@{$regex}@i";
             if (!preg_match($regex, $content)) {
                 continue;
             }
