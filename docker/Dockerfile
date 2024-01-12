@@ -32,6 +32,8 @@ RUN curl https://getcomposer.org/installer -o /tmp/composer-installer && \
     rm -rf var vendor && \
     composer install --no-dev --no-scripts -o -a && \
     rm -rf /usr/local/bin/composer && \
-    rm -rf /tmp/composer-installer
+    rm -rf /tmp/composer-installer && \
+    php bin/console cache:clear && \
+    php bin/console cache:warmup
 
 ENTRYPOINT ["/usr/bin/tini", "--", "/var/www/html/docker/entrypoint.bash"]
