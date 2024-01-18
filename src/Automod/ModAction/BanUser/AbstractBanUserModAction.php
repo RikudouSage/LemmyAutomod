@@ -6,6 +6,7 @@ use App\Automod\ModAction\AbstractModAction;
 use App\Entity\BannedUsername;
 use App\Entity\InstanceBanRegex;
 use App\Enum\FurtherAction;
+use App\Message\BanUserMessage;
 use App\Message\RemovePostMessage;
 use App\Repository\BannedUsernameRepository;
 use App\Repository\InstanceBanRegexRepository;
@@ -14,6 +15,7 @@ use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
@@ -63,20 +65,16 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
                 continue;
             }
 
-            $removePosts = !$creator->local;
-            $this->api->admin()->banUser(user: $creator, reason: $rule->getReason(), removeData: $removePosts);
-            if ($creator->local) {
-                $this->deletePostsFederated($creator);
-            }
+            $this->messageBus->dispatch(new BanUserMessage(user: $creator, reason: $rule->getReason(), removePosts: true), [
+                new DispatchAfterCurrentBusStamp(),
+            ]);
             break;
         }
 
         if ($banned = $this->findMatchingUsernameRule($creator->name)) {
-            $removePosts = !$creator->local;
-            $this->api->admin()->banUser(user: $creator, reason: $banned->getReason(), removeData: $removePosts);
-            if ($creator->local) {
-                $this->deletePostsFederated($creator);
-            }
+            $this->messageBus->dispatch(new BanUserMessage(user: $creator, reason: $banned->getReason(), removePosts: true), [
+                new DispatchAfterCurrentBusStamp(),
+            ]);
         }
 
         return FurtherAction::ShouldAbort;
@@ -149,17 +147,5 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
     public function setMessageBus(MessageBusInterface $messageBus): void
     {
         $this->messageBus = $messageBus;
-    }
-
-    private function deletePostsFederated(Person $user): void
-    {
-        $page = 1;
-        do {
-            $posts = $this->api->user()->getPosts($user, page: $page, sort: SortType::New);
-            foreach ($posts as $post) {
-                $this->messageBus->dispatch(new RemovePostMessage($post->post->id));
-            }
-            ++$page;
-        } while (count($posts));
     }
 }
