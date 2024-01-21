@@ -41,6 +41,9 @@ abstract readonly class AbstractReportAction extends AbstractModAction
             return false;
         }
         foreach ($this->getTextsToCheck($object) as $text) {
+            if ($text === null) {
+                continue;
+            }
             $text = $this->transliterator->transliterate($text);
             if ($this->findMatchingRule($text)) {
                 return true;
@@ -53,6 +56,9 @@ abstract readonly class AbstractReportAction extends AbstractModAction
     public function takeAction(object $object, array $previousActions = []): FurtherAction
     {
         foreach ($this->getTextsToCheck($object) as $text) {
+            if ($text === null) {
+                continue;
+            }
             $text = $this->transliterator->transliterate($text);
             if (!$rule = $this->findMatchingRule($text)) {
                 continue;

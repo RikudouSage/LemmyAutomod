@@ -37,6 +37,9 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
     public function shouldRun(object $object): bool
     {
         foreach ($this->getTextsToCheck($object) as $text) {
+            if ($text === null) {
+                continue;
+            }
             $text = $this->transliterator->transliterate($text);
             if ($this->findMatchingRegexRule($text)) {
                 return true;
@@ -63,6 +66,9 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
         }
 
         foreach ($this->getTextsToCheck($object) as $text) {
+            if ($text === null) {
+                continue;
+            }
             $text = $this->transliterator->transliterate($text);
             if (!$rule = $this->findMatchingRegexRule($text)) {
                 continue;
