@@ -3,6 +3,7 @@
 namespace App\Automod\ModAction;
 
 use App\Enum\RunConfiguration;
+use App\Service\Transliterator;
 use Rikudou\LemmyApi\LemmyApi;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentView;
@@ -16,6 +17,7 @@ use Symfony\Contracts\Service\Attribute\Required;
 abstract readonly class AbstractModAction implements ModAction
 {
     protected LemmyApi $api;
+    protected Transliterator $transliterator;
 
     public function getRunConfiguration(): RunConfiguration
     {
@@ -26,5 +28,11 @@ abstract readonly class AbstractModAction implements ModAction
     public function setApi(LemmyApi $api): void
     {
         $this->api = $api;
+    }
+
+    #[Required]
+    public function setTransliterator(Transliterator $transliterator): void
+    {
+        $this->transliterator = $transliterator;
     }
 }

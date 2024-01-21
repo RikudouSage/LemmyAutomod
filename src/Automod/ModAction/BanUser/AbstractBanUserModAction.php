@@ -10,6 +10,7 @@ use App\Message\BanUserMessage;
 use App\Message\RemovePostMessage;
 use App\Repository\BannedUsernameRepository;
 use App\Repository\InstanceBanRegexRepository;
+use App\Service\Transliterator;
 use Rikudou\LemmyApi\Enum\SortType;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentView;
@@ -36,6 +37,7 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
     public function shouldRun(object $object): bool
     {
         foreach ($this->getTextsToCheck($object) as $text) {
+            $text = $this->transliterator->transliterate($text);
             if ($this->findMatchingRegexRule($text)) {
                 return true;
             }
@@ -61,6 +63,7 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
         }
 
         foreach ($this->getTextsToCheck($object) as $text) {
+            $text = $this->transliterator->transliterate($text);
             if (!$rule = $this->findMatchingRegexRule($text)) {
                 continue;
             }

@@ -7,6 +7,7 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-intl": "*",
         "bref/bref": "^2.1",
         "bref/symfony-bridge": "^1.0",
         "bref/symfony-messenger": "^1.1",
