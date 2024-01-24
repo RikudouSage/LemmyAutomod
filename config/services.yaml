@@ -12,6 +12,9 @@ parameters:
     app.notify.new_users: '%env(bool:ENABLE_NEW_USERS_NOTIFICATION)%'
     app.notify.slack.token: '%env(SLACK_BOT_TOKEN)%'
     app.notify.slack.channels: '%env(csv:SLACK_CHANNELS)%'
+    app.notify.matrix.token: '%env(MATRIX_API_TOKEN)%'
+    app.notify.matrix.rooms: '%env(csv:MATRIX_ROOM_NAMES)%'
+    app.notify.matrix.instance: '%env(MATRIX_INSTANCE)%'
 
 services:
     # default configuration for services in *this* file
