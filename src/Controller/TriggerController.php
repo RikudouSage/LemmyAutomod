@@ -51,7 +51,7 @@ final class TriggerController extends AbstractController
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
 
-    #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: null, objectType: 'comment_report', operation: 'INSERT', enhancedFilter: null)]
+    #[WebhookConfig(bodyExpression: '{id: data.data.commentId}', filterExpression: null, objectType: 'comment_report', operation: 'INSERT', enhancedFilter: null)]
     #[Route('/report/comment', name: 'app.triggers.report.comment', methods: [Request::METHOD_POST])]
     public function newCommentReportCreated(
         #[MapRequestPayload] TriggerIdRequest $request,
@@ -61,7 +61,7 @@ final class TriggerController extends AbstractController
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
 
-    #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: null, objectType: 'post_report', operation: 'INSERT', enhancedFilter: null)]
+    #[WebhookConfig(bodyExpression: '{id: data.data.postId}', filterExpression: null, objectType: 'post_report', operation: 'INSERT', enhancedFilter: null)]
     #[Route('/report/post', name: 'app.triggers.report.post', methods: [Request::METHOD_POST])]
     public function newPostReportCreated(
         #[MapRequestPayload] TriggerIdRequest $request,
