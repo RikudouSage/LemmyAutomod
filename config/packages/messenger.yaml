@@ -10,14 +10,14 @@ framework:
             # sync: 'sync://'
 
         routing:
-            App\Message\AnalyzePostMessage: async
             App\Message\AnalyzeCommentMessage: async
-            App\Message\RemovePostMessage: async
             App\Message\AnalyzeCommentReportMessage: async
-            App\Message\SendNotificationAsyncMessage: async
-            App\Message\BanUserMessage: async
+            App\Message\AnalyzePostMessage: async
             App\Message\AnalyzePostReportMessage: async
             App\Message\AnalyzeUserMessage: async
+            App\Message\BanUserMessage: async
+            App\Message\RemovePostMessage: async
+            App\Message\SendNotificationAsyncMessage: async
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
 
