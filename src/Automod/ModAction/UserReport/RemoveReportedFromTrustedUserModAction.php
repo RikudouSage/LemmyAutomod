@@ -29,7 +29,7 @@ final readonly class RemoveReportedFromTrustedUserModAction extends AbstractModA
         }
 
         $trustedIds = array_map(function (TrustedUser $user) {
-            if (!$user->getUserId()) {
+            if ($user->getUserId()) {
                 return $user->getUserId();
             }
 
