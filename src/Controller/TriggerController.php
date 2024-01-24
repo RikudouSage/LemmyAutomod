@@ -3,12 +3,12 @@
 namespace App\Controller;
 
 use App\Attribute\WebhookConfig;
-use App\Automod\Automod;
 use App\Dto\Request\TriggerIdRequest;
 use App\Message\AnalyzeCommentMessage;
+use App\Message\AnalyzeCommentReportMessage;
 use App\Message\AnalyzePostMessage;
+use App\Message\AnalyzePostReportMessage;
 use App\Message\AnalyzeUserMessage;
-use Rikudou\LemmyApi\LemmyApi;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -48,6 +48,26 @@ final class TriggerController extends AbstractController
         MessageBusInterface $messageBus,
     ): JsonResponse {
         $messageBus->dispatch(new AnalyzeUserMessage($request->id));
+        return new JsonResponse(status: Response::HTTP_NO_CONTENT);
+    }
+
+    #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: null, objectType: 'comment_report', operation: 'INSERT', enhancedFilter: null)]
+    #[Route('/report/comment', name: 'app.triggers.report.comment', methods: [Request::METHOD_POST])]
+    public function newCommentReportCreated(
+        #[MapRequestPayload] TriggerIdRequest $request,
+        MessageBusInterface $messageBus,
+    ): JsonResponse {
+        $messageBus->dispatch(new AnalyzeCommentReportMessage($request->id));
+        return new JsonResponse(status: Response::HTTP_NO_CONTENT);
+    }
+
+    #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: null, objectType: 'post_report', operation: 'INSERT', enhancedFilter: null)]
+    #[Route('/report/post', name: 'app.triggers.report.post', methods: [Request::METHOD_POST])]
+    public function newPostReportCreated(
+        #[MapRequestPayload] TriggerIdRequest $request,
+        MessageBusInterface $messageBus,
+    ): JsonResponse {
+        $messageBus->dispatch(new AnalyzePostReportMessage($request->id));
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
 }

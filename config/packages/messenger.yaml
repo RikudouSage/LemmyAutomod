@@ -13,9 +13,11 @@ framework:
             App\Message\AnalyzePostMessage: async
             App\Message\AnalyzeCommentMessage: async
             App\Message\RemovePostMessage: async
-            App\Message\AnalyzeUserMessage: async
+            App\Message\AnalyzeCommentReportMessage: async
             App\Message\SendNotificationAsyncMessage: async
             App\Message\BanUserMessage: async
+            App\Message\AnalyzePostReportMessage: async
+            App\Message\AnalyzeUserMessage: async
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
 
