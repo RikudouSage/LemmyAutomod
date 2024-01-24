@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Automod\ModAction\BanUser;
+namespace App\Automod\ModAction\UserReport;
 
 use App\Automod\ModAction\AbstractModAction;
 use App\Entity\TrustedUser;
@@ -14,7 +14,7 @@ use Rikudou\LemmyApi\Response\View\PostReportView;
 /**
  * @extends AbstractModAction<CommentReportView|PostReportView>
  */
-final readonly class BanReportedFromTrustedUserModAction extends AbstractModAction
+final readonly class RemoveReportedFromTrustedUserModAction extends AbstractModAction
 {
     public function __construct(
         private TrustedUserRepository $trustedUserRepository,
@@ -52,9 +52,11 @@ final readonly class BanReportedFromTrustedUserModAction extends AbstractModActi
     {
         if ($object instanceof CommentReportView) {
             $this->api->moderator()->removeComment($object->comment, $object->commentReport->reason);
+            $this->api->moderator()->resolveCommentReport($object->commentReport);
         }
         if ($object instanceof PostReportView) {
             $this->api->moderator()->removePost($object->post, $object->postReport->reason);
+            $this->api->moderator()->resolvePostReport($object->postReport);
         }
 
         return FurtherAction::CanContinue;
