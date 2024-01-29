@@ -37,6 +37,9 @@ final readonly class NotifyOnFirstPostOrComment implements ModAction
         if (!$object instanceof CommentView && !$object instanceof PostView) {
             return false;
         }
+        if (!$object->creator->local) {
+            return false;
+        }
 
         $counts = $this->api->user()->getCounts($object->creator);
         if ($object instanceof CommentView && $counts->commentCount === 1) {

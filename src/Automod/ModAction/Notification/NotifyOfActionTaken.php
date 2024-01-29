@@ -59,6 +59,10 @@ final readonly class NotifyOfActionTaken implements ModAction
             array_filter($previousActions, fn (ModAction $action) => $action->getDescription() !== null),
         );
 
+        if (!count($actionNames)) {
+            return FurtherAction::CanContinue;
+        }
+
         $message = "Actions have been taken against [{$username}](https://{$this->instance}/u/{$username}) for {$target}:\n\n";
 
         foreach ($actionNames as $actionName) {
