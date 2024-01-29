@@ -2728,16 +2728,16 @@
         },
         {
             "name": "rikudou/lemmy-api",
-            "version": "v0.5.7",
+            "version": "v0.5.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RikudouSage/LemmyApi.git",
-                "reference": "43c3ebdb1142a647e05a5757ea45e813b1e3b1a0"
+                "reference": "c4c2f06d41bdb1843a39a835beee050ecd09a125"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RikudouSage/LemmyApi/zipball/43c3ebdb1142a647e05a5757ea45e813b1e3b1a0",
-                "reference": "43c3ebdb1142a647e05a5757ea45e813b1e3b1a0",
+                "url": "https://api.github.com/repos/RikudouSage/LemmyApi/zipball/c4c2f06d41bdb1843a39a835beee050ecd09a125",
+                "reference": "c4c2f06d41bdb1843a39a835beee050ecd09a125",
                 "shasum": ""
             },
             "require": {
@@ -2771,9 +2771,9 @@
             "description": "Communicate with Lemmy API from php",
             "support": {
                 "issues": "https://github.com/RikudouSage/LemmyApi/issues",
-                "source": "https://github.com/RikudouSage/LemmyApi/tree/v0.5.7"
+                "source": "https://github.com/RikudouSage/LemmyApi/tree/v0.5.8"
             },
-            "time": "2024-01-29T13:01:25+00:00"
+            "time": "2024-01-29T13:06:32+00:00"
         },
         {
             "name": "riverline/multipart-parser",
