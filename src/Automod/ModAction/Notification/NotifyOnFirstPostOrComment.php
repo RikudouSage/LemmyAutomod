@@ -11,6 +11,9 @@ use Rikudou\LemmyApi\Response\View\CommentView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
+/**
+ * @implements ModAction<CommentView|PostView>
+ */
 final readonly class NotifyOnFirstPostOrComment implements ModAction
 {
     public function __construct(

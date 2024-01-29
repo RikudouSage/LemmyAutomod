@@ -10,6 +10,7 @@ use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\CommentView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
 use Rikudou\LemmyApi\Response\View\PostView;
+use Rikudou\LemmyApi\Response\View\RegistrationApplicationView;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 
 final readonly class Automod
@@ -24,7 +25,7 @@ final readonly class Automod
     }
 
     public function analyze(
-        PostView|CommentView|Person|CommentReportView|PostReportView $object
+        PostView|CommentView|Person|CommentReportView|PostReportView|RegistrationApplicationView $object
     ): void {
         $furtherAction = FurtherAction::CanContinue;
         $previousActions = [];
