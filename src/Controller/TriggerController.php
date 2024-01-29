@@ -8,6 +8,7 @@ use App\Message\AnalyzeCommentMessage;
 use App\Message\AnalyzeCommentReportMessage;
 use App\Message\AnalyzePostMessage;
 use App\Message\AnalyzePostReportMessage;
+use App\Message\AnalyzeRegistrationApplicationMessage;
 use App\Message\AnalyzeUserMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -68,6 +69,16 @@ final class TriggerController extends AbstractController
         MessageBusInterface $messageBus,
     ): JsonResponse {
         $messageBus->dispatch(new AnalyzePostReportMessage($request->id));
+        return new JsonResponse(status: Response::HTTP_NO_CONTENT);
+    }
+
+    #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: null, objectType: 'registration_application', operation: 'INSERT', enhancedFilter: null)]
+    #[Route('/registration-application', name: 'app.triggers.registration_application', methods: [Request::METHOD_POST])]
+    public function registrationApplicationCreated(
+        #[MapRequestPayload] TriggerIdRequest $request,
+        MessageBusInterface $messageBus,
+    ): JsonResponse {
+        $messageBus->dispatch(new AnalyzeRegistrationApplicationMessage($request->id));
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
 }
