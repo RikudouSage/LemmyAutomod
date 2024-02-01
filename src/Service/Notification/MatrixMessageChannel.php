@@ -2,6 +2,7 @@
 
 namespace App\Service\Notification;
 
+use App\Service\LemmyverseLinkReplacer;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,8 +20,11 @@ final readonly class MatrixMessageChannel implements NotificationChannel
         private array $rooms,
         #[Autowire('%app.notify.matrix.instance%')]
         private string $matrixInstance,
+        #[Autowire('%app.notify.matrix.lemmyverse_link%')]
+        private bool $useLemmyverseLink,
         private HttpClientInterface $httpClient,
         private CacheItemPoolInterface $cache,
+        private LemmyverseLinkReplacer $linkReplacer,
     ) {
     }
 
@@ -36,6 +40,9 @@ final readonly class MatrixMessageChannel implements NotificationChannel
 
     public function notify(string $message): void
     {
+        if ($this->useLemmyverseLink) {
+            $message = $this->linkReplacer->replace($message);
+        }
         foreach ($this->rooms as $room) {
             $roomId = $this->getRoomId($room);
             $instance = $this->getInstance($room);

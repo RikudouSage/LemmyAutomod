@@ -2,6 +2,7 @@
 
 namespace App\Service\Notification;
 
+use App\Service\LemmyverseLinkReplacer;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -16,7 +17,10 @@ final readonly class SlackMessageChannel implements NotificationChannel
         private string $token,
         #[Autowire('%app.notify.slack.channels%')]
         private array $channels,
+        #[Autowire('%app.notify.slack.lemmyverse_link%')]
+        private bool $useLemmyverseLink,
         private HttpClientInterface $httpClient,
+        private LemmyverseLinkReplacer $linkReplacer,
     ) {
     }
 
@@ -32,6 +36,9 @@ final readonly class SlackMessageChannel implements NotificationChannel
 
     public function notify(string $message): void
     {
+        if ($this->useLemmyverseLink) {
+            $message = $this->linkReplacer->replace($message);
+        }
         foreach ($this->channels as $channel) {
             $this->httpClient->request(Request::METHOD_POST, 'https://slack.com/api/chat.postMessage', [
                 'json' => [

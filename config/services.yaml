@@ -11,11 +11,17 @@ parameters:
     app.lemmy.notify_users: '%env(csv:LEMMY_USERS_TO_NOTIFY)%'
     app.notify.new_users: '%env(bool:ENABLE_NEW_USERS_NOTIFICATION)%'
     app.notify.first_post_comment: '%env(bool:ENABLE_FIRST_POST_COMMENT_NOTIFICATION)%'
+
     app.notify.slack.token: '%env(SLACK_BOT_TOKEN)%'
     app.notify.slack.channels: '%env(csv:SLACK_CHANNELS)%'
+    app.notify.slack.lemmyverse_link: '%env(bool:USE_LEMMYVERSE_LINK_SLACK)%'
+
     app.notify.matrix.token: '%env(MATRIX_API_TOKEN)%'
     app.notify.matrix.rooms: '%env(csv:MATRIX_ROOM_NAMES)%'
     app.notify.matrix.instance: '%env(MATRIX_INSTANCE)%'
+    app.notify.matrix.lemmyverse_link: '%env(bool:USE_LEMMYVERSE_LINK_MATRIX)%'
+
+    app.notify.lemmy.lemmyverse_link: '%env(bool:USE_LEMMYVERSE_LINK_LEMMY)%'
 
 services:
     # default configuration for services in *this* file
