@@ -3,6 +3,7 @@
 namespace App\Service\Notification;
 
 use App\Service\LemmyverseLinkReplacer;
+use League\CommonMark\CommonMarkConverter;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +26,7 @@ final readonly class MatrixMessageChannel implements NotificationChannel
         private HttpClientInterface $httpClient,
         private CacheItemPoolInterface $cache,
         private LemmyverseLinkReplacer $linkReplacer,
+        private CommonMarkConverter $markdownParser,
     ) {
     }
 
@@ -51,6 +53,8 @@ final readonly class MatrixMessageChannel implements NotificationChannel
                 'json' => [
                     'msgtype' => 'm.text',
                     'body' => $message,
+                    'formatted_body' => $this->markdownParser->convert($message)->getContent(),
+                    'format' => 'org.matrix.custom.html',
                 ],
             ]);
         }

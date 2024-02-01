@@ -58,3 +58,5 @@ services:
             # Pass the transport name used in config/packages/messenger.yaml
             $transportName: 'async'
             $partialBatchFailure: true
+
+    League\CommonMark\CommonMarkConverter:
