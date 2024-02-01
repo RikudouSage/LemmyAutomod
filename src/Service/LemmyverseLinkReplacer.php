@@ -16,8 +16,8 @@ final readonly class LemmyverseLinkReplacer
     {
         $instance = preg_quote($this->instance);
 
-        $message = preg_replace("@https://{$instance}/([uc])@", 'https://lemmyverse.link/$1', $message);
-        $message = preg_replace("@https://{$instance}/(comment|post)@", "https://lemmyverse.link/{$instance}/$1", $message);
+        $message = preg_replace("@https://{$instance}/([uc])/@", 'https://lemmyverse.link/$1/', $message);
+        $message = preg_replace("@https://{$instance}/(comment|post)@", "https://lemmyverse.link/{$this->instance}/$1", $message);
 
         return $message;
     }
