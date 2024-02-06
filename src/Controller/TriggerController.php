@@ -3,9 +3,11 @@
 namespace App\Controller;
 
 use App\Attribute\WebhookConfig;
+use App\Dto\Model\LocalUser;
 use App\Dto\Request\TriggerIdRequest;
 use App\Message\AnalyzeCommentMessage;
 use App\Message\AnalyzeCommentReportMessage;
+use App\Message\AnalyzeLocalUserMessage;
 use App\Message\AnalyzePostMessage;
 use App\Message\AnalyzePostReportMessage;
 use App\Message\AnalyzeRegistrationApplicationMessage;
@@ -42,13 +44,13 @@ final class TriggerController extends AbstractController
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
 
-    #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: 'data.data.local', objectType: 'person', operation: 'INSERT', enhancedFilter: null)]
+    #[WebhookConfig(bodyExpression: 'data.data', filterExpression: null, objectType: 'local_user', operation: 'INSERT', enhancedFilter: null)]
     #[Route('/new-user', name: 'app.triggers.user.new', methods: [Request::METHOD_POST])]
     public function newLocalUser(
-        #[MapRequestPayload] TriggerIdRequest $request,
+        #[MapRequestPayload] LocalUser $request,
         MessageBusInterface $messageBus,
     ): JsonResponse {
-        $messageBus->dispatch(new AnalyzeUserMessage($request->id));
+        $messageBus->dispatch(new AnalyzeLocalUserMessage($request));
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
 

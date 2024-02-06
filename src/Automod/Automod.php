@@ -3,6 +3,7 @@
 namespace App\Automod;
 
 use App\Automod\ModAction\ModAction;
+use App\Dto\Model\LocalUser;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
 use Rikudou\LemmyApi\Response\Model\Person;
@@ -25,7 +26,7 @@ final readonly class Automod
     }
 
     public function analyze(
-        PostView|CommentView|Person|CommentReportView|PostReportView|RegistrationApplicationView $object
+        PostView|CommentView|Person|CommentReportView|PostReportView|RegistrationApplicationView|LocalUser $object
     ): void {
         $furtherAction = FurtherAction::CanContinue;
         $previousActions = [];

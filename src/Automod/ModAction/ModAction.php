@@ -2,6 +2,7 @@
 
 namespace App\Automod\ModAction;
 
+use App\Dto\Model\LocalUser;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
 use Rikudou\LemmyApi\Response\Model\Person;
@@ -14,7 +15,7 @@ use Rikudou\LemmyApi\Response\View\RegistrationApplicationView;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * @template TObject of (PostView|CommentView|Person|CommentReportView|PostReportView|PrivateMessageReportView|RegistrationApplicationView)
+ * @template TObject of (PostView|CommentView|Person|CommentReportView|PostReportView|PrivateMessageReportView|RegistrationApplicationView|LocalUser)
  */
 #[AutoconfigureTag(name: 'app.mod_action')]
 interface ModAction

@@ -7,7 +7,7 @@ use Rikudou\LemmyApi\Response\Model\Person;
 /**
  * @extends AbstractBanUserModAction<Person>
  */
-final readonly class BanUserWhenCreatedAction extends AbstractBanUserModAction
+final readonly class BanUserForUsernamesAction extends AbstractBanUserModAction
 {
     public function shouldRun(object $object): bool
     {
