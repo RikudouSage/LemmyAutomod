@@ -76,7 +76,7 @@ final class DumpWebhookConfigCommand extends Command
                 }
 
                 $config = [
-                    'uniqueMachineName' => $routeConfig->getName(),
+                    'uniqueMachineName' => str_replace('app.', 'rikudou.automod.', $routeConfig->getName()),
                     'url' => "{$baseUrl}{$url}",
                     'method' => $routeConfig->getMethods()[array_key_first($routeConfig->getMethods())],
                     'objectType' => $webhookConfig->objectType,
