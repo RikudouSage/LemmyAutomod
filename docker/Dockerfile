@@ -38,6 +38,8 @@ RUN curl https://getcomposer.org/installer -o /tmp/composer-installer && \
     chmod +x composer.phar && \
     mv composer.phar /usr/local/bin/composer && \
     COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload -o -a && \
+    rm -rf /usr/local/bin/composer && \
+    rm -rf /tmp/composer-installer && \
     php bin/console cache:clear && \
     php bin/console cache:warmup && \
     chown -R 33:33 var
