@@ -17,14 +17,11 @@ RUN docker-php-ext-install intl opcache pcntl pdo pdo_pgsql && \
     docker-php-ext-enable redis
 RUN a2enmod rewrite
 
-COPY --chown=33:33 . /var/www/html
-COPY docker/php.ini /usr/local/etc/php/conf.d/99-custom.ini
-COPY docker/supervisor.conf /etc/supervisor/conf.d/messenger-worker.conf
-RUN mkdir /opt/database && \
-    chown 33:33 /opt/* && \
-    chmod +x /var/www/html/docker/entrypoint.bash
-
 WORKDIR /var/www/html
+
+COPY --chown=33:33 composer.json /var/www/html/composer.json
+COPY --chown=33:33 composer.lock /var/www/html/composer.lock
+
 RUN curl https://getcomposer.org/installer -o /tmp/composer-installer && \
     php /tmp/composer-installer && \
     chmod +x composer.phar && \
@@ -33,7 +30,22 @@ RUN curl https://getcomposer.org/installer -o /tmp/composer-installer && \
     COMPOSER_ALLOW_SUPERUSER=1 composer install --no-scripts --no-dev -o -a && \
     rm -rf /usr/local/bin/composer && \
     rm -rf /tmp/composer-installer && \
+    chown -R 33:33 vendor
+
+COPY --chown=33:33 . /var/www/html
+RUN curl https://getcomposer.org/installer -o /tmp/composer-installer && \
+    php /tmp/composer-installer && \
+    chmod +x composer.phar && \
+    mv composer.phar /usr/local/bin/composer && \
+    COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload -o -a && \
     php bin/console cache:clear && \
-    php bin/console cache:warmup
+    php bin/console cache:warmup && \
+    chown -R 33:33 var
+
+COPY docker/php.ini /usr/local/etc/php/conf.d/99-custom.ini
+COPY docker/supervisor.conf /etc/supervisor/conf.d/messenger-worker.conf
+RUN mkdir /opt/database && \
+    chown 33:33 /opt/* && \
+    chmod +x /var/www/html/docker/entrypoint.bash
 
 ENTRYPOINT ["/usr/bin/tini", "--", "/var/www/html/docker/entrypoint.bash"]
