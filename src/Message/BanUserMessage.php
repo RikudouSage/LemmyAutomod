@@ -10,6 +10,7 @@ final readonly class BanUserMessage
         public Person $user,
         public string $reason,
         public bool $removePosts,
+        public bool $removeComments,
     ) {
     }
 }

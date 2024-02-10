@@ -21,6 +21,9 @@ class InstanceBanRegex
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $reason = null;
 
+    #[ORM\Column]
+    private bool $removeAll = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -46,6 +49,18 @@ class InstanceBanRegex
     public function setReason(?string $reason): static
     {
         $this->reason = $reason;
+
+        return $this;
+    }
+
+    public function shouldRemoveAll(): bool
+    {
+        return $this->removeAll;
+    }
+
+    public function setRemoveAll(bool $removeAll): static
+    {
+        $this->removeAll = $removeAll;
 
         return $this;
     }

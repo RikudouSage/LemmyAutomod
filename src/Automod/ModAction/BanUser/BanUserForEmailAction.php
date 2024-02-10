@@ -57,7 +57,7 @@ final readonly class BanUserForEmailAction extends AbstractModAction
         $rule = $this->findMatchingEmailRegex($object->email);
         assert($rule !== null);
 
-        $this->messageBus->dispatch(new BanUserMessage(user: $this->api->user()->get($object->personId), reason: $rule->getReason(), removePosts: true), [
+        $this->messageBus->dispatch(new BanUserMessage(user: $this->api->user()->get($object->personId), reason: $rule->getReason(), removePosts: true, removeComments: true), [
             new DispatchAfterCurrentBusStamp(),
         ]);
 

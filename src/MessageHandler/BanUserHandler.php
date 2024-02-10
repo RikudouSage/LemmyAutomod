@@ -3,6 +3,7 @@
 namespace App\MessageHandler;
 
 use App\Message\BanUserMessage;
+use App\Message\RemoveCommentMessage;
 use App\Message\RemovePostMessage;
 use Rikudou\LemmyApi\Enum\SortType;
 use Rikudou\LemmyApi\LemmyApi;
@@ -26,6 +27,9 @@ final readonly class BanUserHandler
         if ($message->removePosts) {
             $this->deletePostsFederated($message->user);
         }
+        if ($message->removeComments) {
+            $this->deleteCommentsFederated($message->user);
+        }
     }
 
     private function deletePostsFederated(Person $user): void
@@ -40,5 +44,19 @@ final readonly class BanUserHandler
             }
             ++$page;
         } while (count($posts));
+    }
+
+    private function deleteCommentsFederated(Person $user): void
+    {
+        $page = 1;
+        do {
+            $comments = $this->api->user()->getComments($user, page: $page, sort: SortType::New);
+            foreach ($comments as $comment) {
+                $this->messageBus->dispatch(new RemoveCommentMessage($comment->comment->id), [
+                    new DispatchAfterCurrentBusStamp(),
+                ]);
+            }
+            ++$page;
+        } while (count($comments));
     }
 }

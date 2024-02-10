@@ -7,6 +7,7 @@ use App\Entity\BannedUsername;
 use App\Entity\InstanceBanRegex;
 use App\Enum\FurtherAction;
 use App\Message\BanUserMessage;
+use App\Message\RemoveCommentMessage;
 use App\Message\RemovePostMessage;
 use App\Repository\BannedUsernameRepository;
 use App\Repository\InstanceBanRegexRepository;
@@ -74,14 +75,24 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
                 continue;
             }
 
-            $this->messageBus->dispatch(new BanUserMessage(user: $creator, reason: $rule->getReason(), removePosts: true), [
+
+            if ($object instanceof PostView) {
+                $this->messageBus->dispatch(new RemovePostMessage($object->post->id), [
+                    new DispatchAfterCurrentBusStamp(),
+                ]);
+            } elseif ($object instanceof CommentView) {
+                $this->messageBus->dispatch(new RemoveCommentMessage($object->comment->id), [
+                    new DispatchAfterCurrentBusStamp(),
+                ]);
+            }
+            $this->messageBus->dispatch(new BanUserMessage(user: $creator, reason: $rule->getReason(), removePosts: $rule->shouldRemoveAll(), removeComments: $rule->shouldRemoveAll()), [
                 new DispatchAfterCurrentBusStamp(),
             ]);
             break;
         }
 
         if ($banned = $this->findMatchingUsernameRule($creator->name)) {
-            $this->messageBus->dispatch(new BanUserMessage(user: $creator, reason: $banned->getReason(), removePosts: true), [
+            $this->messageBus->dispatch(new BanUserMessage(user: $creator, reason: $banned->getReason(), removePosts: $banned->shouldRemoveAll(), removeComments: $banned->shouldRemoveAll()), [
                 new DispatchAfterCurrentBusStamp(),
             ]);
         }
