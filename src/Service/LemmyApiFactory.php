@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use DateInterval;
+use JetBrains\PhpStorm\ExpectedValues;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -27,14 +28,16 @@ final readonly class LemmyApiFactory
     ) {
     }
 
-    public function createApi(): LemmyApi
-    {
+    public function createApi(
+        #[ExpectedValues(valuesFromClass: AuthMode::class)]
+        int $authMode = AuthMode::Both,
+    ): LemmyApi {
         $api = new DefaultLemmyApi(
             instanceUrl: $this->instance,
             version: LemmyApiVersion::Version3,
             httpClient: $this->httpClient,
             requestFactory: $this->requestFactory,
-            authMode: AuthMode::Both,
+            authMode: $authMode,
         );
         $item = $this->cache->getItem('app.jwt');
         if ($item->isHit()) {

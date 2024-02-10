@@ -23,3 +23,9 @@
   - The only field needed is the `user_id`, but if you don't want to go looking in the db for that,
     you can simply provide the `username` and `instance` and the automod will save the `user_id` on 
     its own next time it gets any report
+
+## LEMMY_AUTH_MODE
+
+- `2` - send auth as part of body (supports Lemmy < 0.19)
+- `4` - send auth as a header (supports Lemmy >= 0.19)
+- `6` - send auth both as part of body and as a part of header (supports both Lemmy < 0.19 and >= 0.19)

@@ -7,6 +7,7 @@ parameters:
     app.lemmy.user: '%env(LEMMY_USER)%'
     app.lemmy.password: '%env(LEMMY_PASSWORD)%'
     app.lemmy.instance: '%env(LEMMY_INSTANCE)%'
+    app.lemmy.auth_mode: '%env(int:LEMMY_AUTH_MODE)%'
 
     app.lemmy.notify_users: '%env(csv:LEMMY_USERS_TO_NOTIFY)%'
     app.notify.new_users: '%env(bool:ENABLE_NEW_USERS_NOTIFICATION)%'
@@ -50,6 +51,8 @@ services:
     Rikudou\LemmyApi\LemmyApi:
         class: Rikudou\LemmyApi\DefaultLemmyApi
         factory: ['@App\Service\LemmyApiFactory', 'createApi']
+        arguments:
+            - '%app.lemmy.auth_mode%'
 
     Bref\Symfony\Messenger\Service\Sqs\SqsConsumer:
         public: true
