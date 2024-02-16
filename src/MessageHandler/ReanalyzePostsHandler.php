@@ -42,6 +42,7 @@ final readonly class ReanalyzePostsHandler
             foreach ($posts as $post) {
                 yield $post;
             }
+            ++$page;
         } while (isset($post) && $post->post->published > $until);
     }
 }
