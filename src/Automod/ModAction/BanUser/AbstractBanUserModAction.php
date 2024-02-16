@@ -41,6 +41,9 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
             if ($text === null) {
                 continue;
             }
+            if ($this->findMatchingRegexRule($text)) {
+                return true;
+            }
             $text = $this->transliterator->transliterate($text);
             if ($this->findMatchingRegexRule($text)) {
                 return true;
@@ -70,8 +73,9 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
             if ($text === null) {
                 continue;
             }
-            $text = $this->transliterator->transliterate($text);
-            if (!$rule = $this->findMatchingRegexRule($text)) {
+            $transliterated = $this->transliterator->transliterate($text);
+            $rule = $this->findMatchingRegexRule($text) ?? $this->findMatchingRegexRule($transliterated);
+            if (!$rule) {
                 continue;
             }
 
