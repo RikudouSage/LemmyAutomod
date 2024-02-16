@@ -8,7 +8,7 @@ use JetBrains\PhpStorm\ExpectedValues;
 /**
  * Describes parameters to use for LemmyWebhook, has no real use except documentation.
  */
-#[Attribute(Attribute::TARGET_METHOD)]
+#[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 final readonly class WebhookConfig
 {
     public function __construct(
@@ -18,6 +18,7 @@ final readonly class WebhookConfig
         #[ExpectedValues(values: ['INSERT', 'UPDATE', 'DELETE'])]
         public string $operation,
         public ?string $enhancedFilter,
+        public ?string $uniqueNameSuffix = null,
     ) {
     }
 }

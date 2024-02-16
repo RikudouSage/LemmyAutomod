@@ -4,6 +4,7 @@ namespace App\Command;
 
 use App\Attribute\WebhookConfig;
 use LogicException;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 use ReflectionObject;
@@ -51,7 +52,7 @@ final class DumpWebhookConfigCommand extends Command
             $reflection = new ReflectionObject($controller);
             $controllerRouteConfig = $this->getAttribute($reflection, Route::class);
             foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
-                if (!$webhookConfig = $this->getAttribute($method, WebhookConfig::class)) {
+                if (!$webhookConfigs = $this->getAttributes($method, WebhookConfig::class)) {
                     continue;
                 }
                 if (!$routeConfig = $this->getAttribute($method, Route::class)) {
@@ -75,23 +76,29 @@ final class DumpWebhookConfigCommand extends Command
                     $url = "/{$url}";
                 }
 
-                $config = [
-                    'uniqueMachineName' => str_replace('app.', 'rikudou.automod.', $routeConfig->getName()),
-                    'url' => "{$baseUrl}{$url}",
-                    'method' => $routeConfig->getMethods()[array_key_first($routeConfig->getMethods())],
-                    'objectType' => $webhookConfig->objectType,
-                    'operation' => $webhookConfig->operation,
-                ];
-                if ($webhookConfig->bodyExpression) {
-                    $config['bodyExpression'] = $webhookConfig->bodyExpression;
+                foreach ($webhookConfigs as $webhookConfig) {
+                    $uniqueName = str_replace('app.', 'rikudou.automod.', $routeConfig->getName());
+                    if ($suffix = $webhookConfig->uniqueNameSuffix) {
+                        $uniqueName .= ".{$suffix}";
+                    }
+                    $config = [
+                        'uniqueMachineName' => $uniqueName,
+                        'url' => "{$baseUrl}{$url}",
+                        'method' => $routeConfig->getMethods()[array_key_first($routeConfig->getMethods())],
+                        'objectType' => $webhookConfig->objectType,
+                        'operation' => $webhookConfig->operation,
+                    ];
+                    if ($webhookConfig->bodyExpression) {
+                        $config['bodyExpression'] = $webhookConfig->bodyExpression;
+                    }
+                    if ($webhookConfig->filterExpression) {
+                        $config['filterExpression'] = $webhookConfig->filterExpression;
+                    }
+                    if ($webhookConfig->enhancedFilter) {
+                        $config['enhancedFilterExpression'] = $webhookConfig->enhancedFilter;
+                    }
+                    $result['webhooks'][] = $config;
                 }
-                if ($webhookConfig->filterExpression) {
-                    $config['filterExpression'] = $webhookConfig->filterExpression;
-                }
-                if ($webhookConfig->enhancedFilter) {
-                    $config['enhancedFilterExpression'] = $webhookConfig->enhancedFilter;
-                }
-                $result['webhooks'][] = $config;
             }
         }
 
@@ -111,11 +118,27 @@ final class DumpWebhookConfigCommand extends Command
      */
     private function getAttribute(ReflectionMethod|ReflectionClass $target, string $attribute): ?object
     {
+        $attributes = $this->getAttributes($target, $attribute);
+        if (!$attributes) {
+            return null;
+        }
+
+        return $attributes[array_key_first($attributes)];
+    }
+
+    /**
+     * @template TAttribute of object
+     * @param ReflectionMethod|ReflectionClass<object> $target
+     * @param class-string<TAttribute> $attribute
+     * @return array<TAttribute>|null
+     */
+    private function getAttributes(ReflectionMethod|ReflectionClass $target, string $attribute): ?array
+    {
         $attributes = $target->getAttributes($attribute);
         if (!count($attributes)) {
             return null;
         }
 
-        return $attributes[array_key_first($attributes)]->newInstance();
+        return array_map(fn(ReflectionAttribute $attribute) => $attribute->newInstance(), $attributes);
     }
 }

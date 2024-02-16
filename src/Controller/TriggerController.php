@@ -24,6 +24,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class TriggerController extends AbstractController
 {
     #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: null, objectType: 'post', operation: 'INSERT', enhancedFilter: null)]
+    #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: null, objectType: 'post', operation: 'UPDATE', enhancedFilter: null, uniqueNameSuffix: 'update')]
     #[Route('/post', name: 'app.triggers.post', methods: [Request::METHOD_POST])]
     public function post(
         #[MapRequestPayload] TriggerIdRequest $request,
@@ -34,6 +35,7 @@ final class TriggerController extends AbstractController
     }
 
     #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: null, objectType: 'comment', operation: 'INSERT', enhancedFilter: null)]
+    #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: null, objectType: 'comment', operation: 'UPDATE', enhancedFilter: null, uniqueNameSuffix: 'update')]
     #[Route('/comment', name: 'app.triggers.comment', methods: [Request::METHOD_POST])]
     public function comment(
         #[MapRequestPayload] TriggerIdRequest $request,
