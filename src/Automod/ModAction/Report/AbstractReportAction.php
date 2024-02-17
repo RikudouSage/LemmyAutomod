@@ -3,6 +3,7 @@
 namespace App\Automod\ModAction\Report;
 
 use App\Automod\ModAction\AbstractModAction;
+use App\Context\Context;
 use App\Entity\ReportRegex;
 use App\Enum\FurtherAction;
 use App\Repository\ReportRegexRepository;
@@ -53,7 +54,7 @@ abstract readonly class AbstractReportAction extends AbstractModAction
         return false;
     }
 
-    public function takeAction(object $object, array $previousActions = []): FurtherAction
+    public function takeAction(object $object, Context $context = new Context()): FurtherAction
     {
         foreach ($this->getTextsToCheck($object) as $text) {
             if ($text === null) {
@@ -64,16 +65,13 @@ abstract readonly class AbstractReportAction extends AbstractModAction
                 continue;
             }
 
+            $context->addMessage("content has been reported for matching regex `{$rule->getRegex()}`");
+
             $this->report($object, $rule->getMessage());
             break;
         }
 
         return FurtherAction::CanContinue;
-    }
-
-    public function getDescription(): ?string
-    {
-        return 'user has been reported';
     }
 
     private function findMatchingRule(?string $content): ?ReportRegex

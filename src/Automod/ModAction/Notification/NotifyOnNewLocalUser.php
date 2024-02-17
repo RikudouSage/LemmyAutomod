@@ -4,6 +4,7 @@ namespace App\Automod\ModAction\Notification;
 
 use App\Automod\Enum\AutomodPriority;
 use App\Automod\ModAction\ModAction;
+use App\Context\Context;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
 use App\Service\Notification\NotificationSender;
@@ -31,7 +32,7 @@ final readonly class NotifyOnNewLocalUser implements ModAction
         return $this->enabled && $object instanceof Person && $object->local && $this->notificationSender->hasEnabledChannels();
     }
 
-    public function takeAction(object $object, array $previousActions = []): FurtherAction
+    public function takeAction(object $object, Context $context = new Context()): FurtherAction
     {
         $this->notificationSender->sendNotificationAsync(
             "New user has been added: [{$object->name}](https://{$this->instance}/u/{$object->name}@{$this->instance})",
@@ -43,10 +44,5 @@ final readonly class NotifyOnNewLocalUser implements ModAction
     public function getRunConfiguration(): RunConfiguration
     {
         return RunConfiguration::Always;
-    }
-
-    public function getDescription(): ?string
-    {
-        return null;
     }
 }

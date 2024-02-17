@@ -3,6 +3,7 @@
 namespace App\Automod\ModAction\Notification;
 
 use App\Automod\ModAction\ModAction;
+use App\Context\Context;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
 use App\Service\Notification\NotificationSender;
@@ -52,7 +53,7 @@ final readonly class NotifyOnFirstPostOrComment implements ModAction
         return false;
     }
 
-    public function takeAction(object $object, array $previousActions = []): FurtherAction
+    public function takeAction(object $object, Context $context = new Context()): FurtherAction
     {
         if ($object instanceof CommentView) {
             $this->notificationSender->sendNotificationAsync("User's first comment: https://{$this->instance}/comment/{$object->comment->id}");
@@ -67,10 +68,5 @@ final readonly class NotifyOnFirstPostOrComment implements ModAction
     public function getRunConfiguration(): RunConfiguration
     {
         return RunConfiguration::Always;
-    }
-
-    public function getDescription(): ?string
-    {
-        return null;
     }
 }

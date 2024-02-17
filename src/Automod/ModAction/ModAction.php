@@ -2,6 +2,7 @@
 
 namespace App\Automod\ModAction;
 
+use App\Context\Context;
 use App\Dto\Model\LocalUser;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
@@ -24,11 +25,9 @@ interface ModAction
 
     /**
      * @param TObject $object
-     * @param array<ModAction> $previousActions
      */
-    public function takeAction(object $object, array $previousActions = []): FurtherAction;
+    public function takeAction(object $object, Context $context = new Context()): FurtherAction;
 
     public function getRunConfiguration(): RunConfiguration;
 
-    public function getDescription(): ?string;
 }

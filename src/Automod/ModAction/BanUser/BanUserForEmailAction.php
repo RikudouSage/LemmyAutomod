@@ -3,6 +3,7 @@
 namespace App\Automod\ModAction\BanUser;
 
 use App\Automod\ModAction\AbstractModAction;
+use App\Context\Context;
 use App\Dto\Model\LocalUser;
 use App\Entity\BannedEmail;
 use App\Enum\FurtherAction;
@@ -48,7 +49,7 @@ final readonly class BanUserForEmailAction extends AbstractModAction
     }
 
     #[Override]
-    public function takeAction(object $object, array $previousActions = []): FurtherAction
+    public function takeAction(object $object, Context $context = new Context()): FurtherAction
     {
         if ($object->admin) {
             return FurtherAction::ShouldAbort;
@@ -60,13 +61,8 @@ final readonly class BanUserForEmailAction extends AbstractModAction
         $this->messageBus->dispatch(new BanUserMessage(user: $this->api->user()->get($object->personId), reason: $rule->getReason(), removePosts: true, removeComments: true), [
             new DispatchAfterCurrentBusStamp(),
         ]);
+        $context->addMessage("banned for their email matching regex `{$rule->getRegex()}`");
 
         return FurtherAction::ShouldAbort;
-    }
-
-    #[Override]
-    public function getDescription(): ?string
-    {
-        return 'user has been banned for their email';
     }
 }

@@ -3,13 +3,16 @@
 namespace App\Automod\ModAction\UserReport;
 
 use App\Automod\ModAction\AbstractModAction;
+use App\Context\Context;
 use App\Entity\TrustedUser;
 use App\Enum\FurtherAction;
 use App\Repository\TrustedUserRepository;
+use App\Service\InstanceLinkConverter;
 use Doctrine\ORM\EntityManagerInterface;
 use LogicException;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
  * @extends AbstractModAction<CommentReportView|PostReportView>
@@ -19,6 +22,9 @@ final readonly class RemoveReportedFromTrustedUserModAction extends AbstractModA
     public function __construct(
         private TrustedUserRepository $trustedUserRepository,
         private EntityManagerInterface $entityManager,
+        private InstanceLinkConverter $linkConverter,
+        #[Autowire('%app.lemmy.instance%')]
+        private string $instance,
     ) {
     }
 
@@ -48,22 +54,25 @@ final readonly class RemoveReportedFromTrustedUserModAction extends AbstractModA
         return in_array($object->creator->id, $trustedIds, true);
     }
 
-    public function takeAction(object $object, array $previousActions = []): FurtherAction
+    public function takeAction(object $object, Context $context = new Context()): FurtherAction
     {
+        $reporter = sprintf(
+            '[%1$s@%2$s](https://%3$s/u/%1$s@%2$s',
+            $object->creator->name,
+            parse_url($object->creator->actorId, PHP_URL_HOST),
+            $this->instance,
+        );
         if ($object instanceof CommentReportView) {
+            $context->addMessage("reported comment ({$this->linkConverter->convertCommentLink($object->comment)}) has been automatically resolved because it was reported by a trusted user ({$reporter})");
             $this->api->moderator()->removeComment($object->comment, $object->commentReport->reason);
             $this->api->moderator()->resolveCommentReport($object->commentReport);
         }
         if ($object instanceof PostReportView) {
+            $context->addMessage("reported post ({$this->linkConverter->convertPostLink($object->post)}) has been automatically resolved because it was reported by a trusted user ({$reporter})");
             $this->api->moderator()->removePost($object->post, $object->postReport->reason);
             $this->api->moderator()->resolvePostReport($object->postReport);
         }
 
         return FurtherAction::CanContinue;
-    }
-
-    public function getDescription(): ?string
-    {
-        return 'the content has been deleted';
     }
 }

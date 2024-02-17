@@ -3,6 +3,7 @@
 namespace App\Automod\ModAction\BanUser;
 
 use App\Automod\ModAction\AbstractModAction;
+use App\Context\Context;
 use App\Entity\BannedUsername;
 use App\Entity\InstanceBanRegex;
 use App\Enum\FurtherAction;
@@ -30,11 +31,6 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
     private MessageBusInterface $messageBus;
     private BannedUsernameRepository $usernameRepository;
 
-    public function getDescription(): ?string
-    {
-        return 'user has been banned';
-    }
-
     public function shouldRun(object $object): bool
     {
         $author = $this->getAuthor($object);
@@ -61,7 +57,7 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
         return false;
     }
 
-    public function takeAction(object $object, array $previousActions = []): FurtherAction
+    public function takeAction(object $object, Context $context = new Context()): FurtherAction
     {
         $creator = $this->getAuthor($object);
 
@@ -83,6 +79,7 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
                 continue;
             }
 
+            $context->addMessage("banned for matching regex `{$rule->getRegex()}`");
 
             if ($object instanceof PostView) {
                 $this->messageBus->dispatch(new RemovePostMessage($object->post->id), [
@@ -100,6 +97,7 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
         }
 
         if ($banned = $this->findMatchingUsernameRule($creator->name)) {
+            $context->addMessage("banned for username matching regex `{$banned->getUsername()}`");
             $this->messageBus->dispatch(new BanUserMessage(user: $creator, reason: $banned->getReason(), removePosts: $banned->shouldRemoveAll(), removeComments: $banned->shouldRemoveAll()), [
                 new DispatchAfterCurrentBusStamp(),
             ]);

@@ -3,6 +3,7 @@
 namespace App\Automod\ModAction\RegistrationApplication;
 
 use App\Automod\ModAction\AbstractModAction;
+use App\Context\Context;
 use App\Enum\FurtherAction;
 use App\Repository\AutoApprovalRegexRepository;
 use Rikudou\LemmyApi\Response\View\RegistrationApplicationView;
@@ -40,15 +41,12 @@ final readonly class AutoApprovalModAction extends AbstractModAction
         return $found;
     }
 
-    public function takeAction(object $object, array $previousActions = []): FurtherAction
+    public function takeAction(object $object, Context $context = new Context()): FurtherAction
     {
         $this->api->admin()->approveRegistrationApplication($object->registrationApplication);
 
-        return FurtherAction::ShouldAbort;
-    }
+        $context->addMessage('Registration application has been automatically approved.');
 
-    public function getDescription(): ?string
-    {
-        return 'user has been automatically approved';
+        return FurtherAction::ShouldAbort;
     }
 }

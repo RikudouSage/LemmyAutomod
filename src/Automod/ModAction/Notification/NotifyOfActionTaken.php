@@ -4,18 +4,24 @@ namespace App\Automod\ModAction\Notification;
 
 use App\Automod\Enum\AutomodPriority;
 use App\Automod\ModAction\ModAction;
+use App\Context\Context;
+use App\Dto\Model\LocalUser;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
 use App\Service\InstanceLinkConverter;
 use App\Service\Notification\NotificationSender;
+use Rikudou\LemmyApi\LemmyApi;
 use Rikudou\LemmyApi\Response\Model\Person;
+use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\CommentView;
+use Rikudou\LemmyApi\Response\View\PostReportView;
 use Rikudou\LemmyApi\Response\View\PostView;
+use Rikudou\LemmyApi\Response\View\RegistrationApplicationView;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * @implements ModAction<CommentView|PostView|Person>
+ * @implements ModAction<CommentView|PostView|Person|RegistrationApplicationView>
  */
 #[AsTaggedItem(priority: AutomodPriority::Notification->value)]
 final readonly class NotifyOfActionTaken implements ModAction
@@ -25,48 +31,56 @@ final readonly class NotifyOfActionTaken implements ModAction
         private string $instance,
         private InstanceLinkConverter $linkConverter,
         private NotificationSender $notificationSender,
+        private LemmyApi $api,
     ) {
     }
 
     public function shouldRun(object $object): bool
     {
-        return ($object instanceof CommentView || $object instanceof PostView || $object instanceof Person)
+        return ($object instanceof CommentView || $object instanceof PostView || $object instanceof Person || $object instanceof RegistrationApplicationView)
             && $this->notificationSender->hasEnabledChannels()
         ;
     }
 
-    public function takeAction(object $object, array $previousActions = []): FurtherAction
+    public function takeAction(object $object, Context $context = new Context()): FurtherAction
     {
-        if (!count($previousActions)) {
+        if (!count($context->getMessages())) {
             return FurtherAction::CanContinue;
         }
-        $username = "{$object->creator->name}@" . parse_url($object->creator->actorId, PHP_URL_HOST);
         $target = null;
+        $username = null;
         if ($object instanceof PostView) {
             $target = $this->linkConverter->convertPostLink($object->post);
+            $username = "{$object->creator->name}@" . parse_url($object->creator->actorId, PHP_URL_HOST);
         } elseif ($object instanceof CommentView) {
             $target = $this->linkConverter->convertCommentLink($object->comment);
+            $username = "{$object->creator->name}@" . parse_url($object->creator->actorId, PHP_URL_HOST);
         } elseif ($object instanceof Person) {
             $target = $this->linkConverter->convertPersonLink($object);
+            $username = "{$object->name}@" . parse_url($object->actorId, PHP_URL_HOST);
+        } elseif ($object instanceof RegistrationApplicationView) {
+            $target = $this->linkConverter->convertPersonLink($object->creator);
+            $username = "{$object->creator->name}@" . parse_url($object->creator->actorId, PHP_URL_HOST);
+        } elseif ($object instanceof CommentReportView) {
+            $target = $this->linkConverter->convertCommentLink($object->comment);
+            $username = "{$object->commentCreator->name}@" . parse_url($object->commentCreator->actorId, PHP_URL_HOST);
+        } elseif ($object instanceof PostReportView) {
+            $target = $this->linkConverter->convertPostLink($object->post);
+            $username = "{$object->postCreator->name}@" . parse_url($object->postCreator->actorId, PHP_URL_HOST);
+        } elseif ($object instanceof LocalUser) {
+            $person = $this->api->user()->get($object->personId);
+            $target = $this->linkConverter->convertPersonLink($person);
+            $username = "{$person->name}@" . parse_url($person->actorId, PHP_URL_HOST);
         }
 
-        if ($target === null) {
-            return FurtherAction::CanContinue;
-        }
-
-        $actionNames = array_map(
-            fn (ModAction $action) => $action->getDescription(),
-            array_filter($previousActions, fn (ModAction $action) => $action->getDescription() !== null),
-        );
-
-        if (!count($actionNames)) {
+        if ($target === null || $username === null) {
             return FurtherAction::CanContinue;
         }
 
         $message = "Actions have been taken against [{$username}](https://{$this->instance}/u/{$username}) for {$target}:\n\n";
 
-        foreach ($actionNames as $actionName) {
-            $message .= " - {$actionName}\n";
+        foreach ($context->getMessages() as $contextMessage) {
+            $message .= " - {$contextMessage}\n";
         }
 
         $this->notificationSender->sendNotificationAsync($message);
@@ -76,10 +90,5 @@ final readonly class NotifyOfActionTaken implements ModAction
     public function getRunConfiguration(): RunConfiguration
     {
         return RunConfiguration::Always;
-    }
-
-    public function getDescription(): ?string
-    {
-        return null;
     }
 }
