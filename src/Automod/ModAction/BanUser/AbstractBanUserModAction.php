@@ -37,6 +37,10 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
 
     public function shouldRun(object $object): bool
     {
+        $author = $this->getAuthor($object);
+        if ($author->banned) {
+            return false;
+        }
         foreach ($this->getTextsToCheck($object) as $text) {
             if ($text === null) {
                 continue;
@@ -50,7 +54,7 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
             }
         }
 
-        if ($this->findMatchingUsernameRule($this->getAuthor($object)->name)) {
+        if ($this->findMatchingUsernameRule($author->name)) {
             return true;
         }
 
