@@ -3,6 +3,7 @@
 namespace App\Automod;
 
 use App\Automod\ModAction\ModAction;
+use App\Context\Context;
 use App\Dto\Model\LocalUser;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
@@ -29,7 +30,7 @@ final readonly class Automod
         PostView|CommentView|Person|CommentReportView|PostReportView|RegistrationApplicationView|LocalUser $object
     ): void {
         $furtherAction = FurtherAction::CanContinue;
-        $previousActions = [];
+        $context = new Context();
 
         foreach ($this->actions as $action) {
             if ($furtherAction !== FurtherAction::CanContinue && $action->getRunConfiguration() !== RunConfiguration::Always) {
@@ -38,8 +39,7 @@ final readonly class Automod
             if (!$action->shouldRun($object)) {
                 continue;
             }
-            $furtherAction = $action->takeAction($object, $previousActions);
-            $previousActions[] = $action;
+            $furtherAction = $action->takeAction($object, $context);
         }
     }
 }
