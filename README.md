@@ -66,7 +66,7 @@ automod:
     image: rikudousage/lemmy-automod
     environment:
       - LEMMY_USER=Automod # Automod lemmy username
-      - LEMMY_INSTANCE=lemmings.world # Automod lemmy instance URL
+      - LEMMY_INSTANCE=lemmings.world # Automod lemmy instance hostname
       - LEMMY_PASSWORD=mypassword # Automod Lemmy password
       - APP_SECRET=[32 character random hex]
       - REDIS_HOST=redis
@@ -224,7 +224,7 @@ And for comments:
 - Author name
 - Author display name
 
-For example, you may want to ban a user that posts a known spam URL:  
+For example, you may want to ban a user that posts a known spam site:  
 `insert into instance_ban_regexes (regex, reason, remove_all) values ('blogspamsite\.com', 'spammer', false);`
 
 This example has "remove_all" set to false. If you set this to true, it will remove all the user's posts. While it's possible to manually un-remove a removed post, it's not easy if there are a large number so use this setting with care.
@@ -233,7 +233,7 @@ This example has "remove_all" set to false. If you set this to true, it will rem
 
 This works the same as [Ban user if content matches regular expression](#34-ban-user-if-content-matches-regular-expression) above, but instead of banning the user it will report them for manual review.
 
-For example. the following will identify comments or posts with the phrase "you're an idiot" and report them for manual review:
+For example. the following will identify comments or posts with the phrase "you're an idiot" and report them for manual review:  
 `insert into report_regexes (regex, message) values ('you\''re an idiot', 'Possible flame war');`
 
 ### **4.6** Trusted users
@@ -245,6 +245,8 @@ The following will add the user @trustworthy_user@lemmings.world into the truste
 
 
 # Information
+
+This sectiion contains descriptions of tables, environment variables, and jobs that can be manually run to do various tasks.
 
 ## Table descriptions
 
@@ -281,7 +283,7 @@ Here is a list of environment variables and their descriptions:
 | Environment Variable          | Description                                                                                                                                                                                                                                                           |
 |-------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | LEMMY_USER                    | Username for Automod Lemmy account.                                                                                                                                                                                                                                   |
-| LEMMY_INSTANCE                | Instance URL of Automod Lemmy account.                                                                                                                                                                                                                                |
+| LEMMY_INSTANCE                | Instance hostname of Automod Lemmy account.                                                                                                                                                                                                                           |
 | LEMMY_PASSWORD                | Password for Automod Lemmy account.                                                                                                                                                                                                                                   |
 | LEMMY_USERS_TO_NOTIFY         | Comma separated list of Lemmy users to message when actions are taken.                                                                                                                                                                                                |
 | APP_SECRET                    | A random 32 hex characters - you can generate this using the terminal command 'openssl rand -hex 16'.                                                                                                                                                                 |
@@ -300,13 +302,21 @@ The options are as follows:
 - `4` - send auth as a header (supports Lemmy >= 0.19)
 - `6` - send auth both as part of body and as a part of header (supports both Lemmy < 0.19 and >= 0.19)
 
-### Manually run on specific content
+## Jobs that can be manually run
 
-LemmyAutomod has the ability to run the checks over a specified post, comment, or user.
+LemmyAutomod has the ability to run the checks over a specified post, comment, or user. It can reanalyze content since a certain point in time, and there are various other jobs that can be run.
 
-docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\AnalyzeCommentMessage --arg [comment ID]
+### Analyze a specific comment or post
+To have the automod check your rules against a specific post, run:  
+`docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\AnalyzePostMessage --arg [post ID]`
 
-docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\AnalyzepostMessage --arg [post ID]
+To have the automod check your rules against a specific comment, run:  
+`docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\AnalyzeCommentMessage --arg [comment ID]`
 
-Re-trigger post check since a date/time:
-docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\ReanalyzePostsMessage --arg '2024-02-16T01:00:00+02:00'
+### Reanalyze all posts since a point in time
+
+You can start a job to reanalyse all posts since a certain time. This might be helpful if you added a new rule, and want to run this over posts already checked before the rule was in place. To do this, run:  
+`docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\ReanalyzePostsMessage --arg [datetime]`  
+
+For example:  
+`docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\ReanalyzePostsMessage --arg '2024-02-16T01:00:00+02:00'`
