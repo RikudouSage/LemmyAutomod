@@ -39,6 +39,10 @@ final readonly class BanUserForImageAction extends AbstractModAction
             return false;
         }
 
+        if (!count($this->imageRepository->findAll())) {
+            return false;
+        }
+
         return true;
     }
 
