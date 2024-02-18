@@ -33,6 +33,7 @@ final readonly class ImageFetcher
             $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
             if (str_starts_with($contentType, 'image/')) {
                 $image = @imagecreatefromstring($response->getContent());
+                error_clear_last();
                 if ($image !== false) {
                     $cacheItem->set(
                         $this->imageComparator->convertHashToBinaryString(
