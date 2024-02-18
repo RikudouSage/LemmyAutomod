@@ -5,6 +5,7 @@ namespace App\Service;
 use DateInterval;
 use Psr\Cache\CacheItemPoolInterface;
 use SapientPro\ImageComparator\ImageComparator;
+use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -32,8 +33,12 @@ final readonly class ImageFetcher
         } else {
             $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
             if (str_starts_with($contentType, 'image/')) {
-                $image = @imagecreatefromstring($response->getContent());
-                error_clear_last();
+                try {
+                    $image = @imagecreatefromstring($response->getContent());
+                } catch (FatalError) {
+                    // ignore that stupidity
+                    $image = false;
+                }
                 if ($image !== false) {
                     $cacheItem->set(
                         $this->imageComparator->convertHashToBinaryString(
