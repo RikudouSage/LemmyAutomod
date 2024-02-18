@@ -35,7 +35,11 @@ final readonly class ImageFetcher
             $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
             if (str_starts_with($contentType, 'image/')) {
                 try {
-                    $image = @imagecreatefromstring($response->getContent());
+                    if ($this->isAnimatedWebP($response->getContent())) {
+                        $image = false;
+                    } else {
+                        $image = imagecreatefromstring($response->getContent());
+                    }
                 } catch (Throwable) {
                     $image = false;
                 }
@@ -58,5 +62,16 @@ final readonly class ImageFetcher
         $this->cache->save($cacheItem);
 
         return $cacheItem->get();
+    }
+
+    private function isAnimatedWebP(string $fileData): bool
+    {
+        if (
+            stripos($fileData, 'WEBPVP8X') !== false ||
+            stripos($fileData, 'ANIM') !== false
+        ) {
+            return true;
+        }
+        return false;
     }
 }

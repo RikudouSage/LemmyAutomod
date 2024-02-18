@@ -4,16 +4,12 @@ use App\Kernel;
 use Bref\Symfony\Messenger\Service\Sqs\SqsConsumer;
 use Symfony\Component\Dotenv\Dotenv;
 
-try {
-    require dirname(__DIR__).'/vendor/autoload.php';
+require dirname(__DIR__).'/vendor/autoload.php';
 
-    (new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
+(new Dotenv())->bootEnv(dirname(__DIR__).'/.env');
 
-    $kernel = new Kernel($_SERVER['APP_ENV'], (bool)$_SERVER['APP_DEBUG']);
-    $kernel->boot();
+$kernel = new Kernel($_SERVER['APP_ENV'], (bool)$_SERVER['APP_DEBUG']);
+$kernel->boot();
 
 // Return the Bref consumer service
-    return $kernel->getContainer()->get(SqsConsumer::class);
-} catch (\Symfony\Component\ErrorHandler\Error\FatalError) {
-    // ignore that piece of crap
-}
+return $kernel->getContainer()->get(SqsConsumer::class);
