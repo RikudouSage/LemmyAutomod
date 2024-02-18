@@ -13,10 +13,4 @@ class Kernel extends BrefKernel
     {
         return $this->getProjectDir() . '/var/cache/' . $this->environment;
     }
-
-    public function boot(): void
-    {
-        parent::boot();
-        set_error_handler(null);
-    }
 }
