@@ -31,19 +31,23 @@ final readonly class ImageFetcher
             $cacheItem->set(null);
         } else {
             $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
-            if (!str_starts_with($contentType, 'image/')) {
-                $cacheItem->set(null);
-            } else {
-                $cacheItem->set(
-                    $this->imageComparator->convertHashToBinaryString(
-                        $this->imageComparator->hashImage(
-                            imagecreatefromstring($response->getContent()),
+            if (str_starts_with($contentType, 'image/')) {
+                $image = @imagecreatefromstring($response->getContent());
+                if ($image !== false) {
+                    $cacheItem->set(
+                        $this->imageComparator->convertHashToBinaryString(
+                            $this->imageComparator->hashImage(
+                                $image,
+                            ),
                         ),
-                    ),
-                );
+                    );
+                }
             }
         }
 
+        if (!$cacheItem->get()) {
+            $cacheItem->set(null);
+        }
         $cacheItem->expiresAfter(new DateInterval('P7D'));
         $this->cache->save($cacheItem);
 
