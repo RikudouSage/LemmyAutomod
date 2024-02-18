@@ -25,6 +25,8 @@ parameters:
 
     app.notify.lemmy.lemmyverse_link: '%env(bool:USE_LEMMYVERSE_LINK_LEMMY)%'
 
+    app.image_check.regex: '%env(IMAGE_CHECK_REGEX)%'
+
 services:
     # default configuration for services in *this* file
     _defaults:

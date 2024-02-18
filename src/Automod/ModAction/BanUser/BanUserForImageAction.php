@@ -11,6 +11,7 @@ use App\Service\ImageFetcher;
 use Override;
 use Rikudou\LemmyApi\Response\View\PostView;
 use SapientPro\ImageComparator\ImageComparator;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DispatchAfterCurrentBusStamp;
 use Symfony\Contracts\HttpClient\Exception\ExceptionInterface;
@@ -26,6 +27,8 @@ final readonly class BanUserForImageAction extends AbstractModAction
         private ImageFetcher $imageFetcher,
         private ImageComparator $imageComparator,
         private MessageBusInterface $messageBus,
+        #[Autowire('%app.image_check.regex%')]
+        private string $imageRegex,
     ) {
     }
 
@@ -39,6 +42,10 @@ final readonly class BanUserForImageAction extends AbstractModAction
             return false;
         }
         if (!$object->post->url) {
+            return false;
+        }
+        $regex = '@' . str_replace('@', '\@', $this->imageRegex) . '@';
+        if (!preg_match($regex, $object->post->url)) {
             return false;
         }
         if (!count($this->imageRepository->findAll())) {
