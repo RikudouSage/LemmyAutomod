@@ -9,6 +9,7 @@ use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Throwable;
 
 final readonly class ImageFetcher
 {
@@ -35,8 +36,7 @@ final readonly class ImageFetcher
             if (str_starts_with($contentType, 'image/')) {
                 try {
                     $image = @imagecreatefromstring($response->getContent());
-                } catch (FatalError) {
-                    // ignore that stupidity
+                } catch (Throwable) {
                     $image = false;
                 }
                 if ($image !== false) {
