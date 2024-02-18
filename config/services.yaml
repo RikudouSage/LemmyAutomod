@@ -64,3 +64,5 @@ services:
             $partialBatchFailure: true
 
     League\CommonMark\CommonMarkConverter:
+
+    SapientPro\ImageComparator\ImageComparator:

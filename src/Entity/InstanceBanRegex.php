@@ -21,7 +21,7 @@ class InstanceBanRegex
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $reason = null;
 
-    #[ORM\Column]
+    #[ORM\Column(options: ['default' => false])]
     private bool $removeAll = false;
 
     public function getId(): ?int

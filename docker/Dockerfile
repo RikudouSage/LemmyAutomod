@@ -10,9 +10,10 @@ RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-av
     sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
 RUN apt-get update && \
-    apt-get -y install libxml2-dev libonig-dev libpq-dev supervisor tini unzip && \
+    apt-get -y install libjpeg-dev libonig-dev libpng-dev libpq-dev libwebp-dev libxml2-dev supervisor tini unzip zlib1g-dev && \
     rm -rf /var/lib/apt/lists/*
-RUN docker-php-ext-install intl opcache pcntl pdo pdo_pgsql && \
+RUN docker-php-ext-configure gd --with-webp --with-jpeg && \
+    docker-php-ext-install gd intl opcache pcntl pdo pdo_pgsql && \
     pecl install redis && \
     docker-php-ext-enable redis
 RUN a2enmod rewrite

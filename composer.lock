@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "008583f9c4a13235bddb90d59c2e3190",
+    "content-hash": "7acc8b4ec58987bbc31381805b39d8b6",
     "packages": [
         {
             "name": "async-aws/core",
@@ -3241,6 +3241,52 @@
                 "source": "https://github.com/Riverline/multipart-parser/tree/2.1.1"
             },
             "time": "2023-04-28T18:53:59+00:00"
+        },
+        {
+            "name": "sapientpro/image-comparator",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sapientpro/image-comparator.git",
+                "reference": "19219b83f4a729e29baae2c490bb8f032cb2d0d7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sapientpro/image-comparator/zipball/19219b83f4a729e29baae2c490bb8f032cb2d0d7",
+                "reference": "19219b83f4a729e29baae2c490bb8f032cb2d0d7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "10.0.0",
+                "squizlabs/php_codesniffer": "3.7.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SapientPro\\ImageComparator\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "SapientPro",
+                    "email": "info@sapient.pro",
+                    "homepage": "https://sapient.pro/"
+                }
+            ],
+            "description": "Compare images using PHP",
+            "support": {
+                "issues": "https://github.com/sapientpro/image-comparator/issues",
+                "source": "https://github.com/sapientpro/image-comparator/tree/v1.0.1"
+            },
+            "time": "2023-04-27T07:54:28+00:00"
         },
         {
             "name": "symfony/amazon-sqs-messenger",
@@ -6727,6 +6773,7 @@
     "platform": {
         "php": ">=8.3",
         "ext-ctype": "*",
+        "ext-gd": "*",
         "ext-iconv": "*",
         "ext-intl": "*"
     },
