@@ -75,6 +75,6 @@ final readonly class InstanceLinkConverter
             return $link;
         }
 
-        return "https://{$this->instance}/u/{$community->name}@{$linkHost}";
+        return "https://{$this->instance}/c/{$community->name}@{$linkHost}";
     }
 }
