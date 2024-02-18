@@ -50,26 +50,33 @@ final readonly class NotifyOfActionTaken implements ModAction
         $target = null;
         $username = null;
         if ($object instanceof PostView) {
-            $target = $this->linkConverter->convertPostLink($object->post);
+            $communityHost = parse_url($object->community->actorId, PHP_URL_HOST);
+            $community = "[!{$object->community->name}@{$communityHost}]({$this->linkConverter->convertCommunityLink($object->community)})";
+            $target = "[this post]({$this->linkConverter->convertPostLink($object->post)}) in {$community}";
             $username = "{$object->creator->name}@" . parse_url($object->creator->actorId, PHP_URL_HOST);
         } elseif ($object instanceof CommentView) {
-            $target = $this->linkConverter->convertCommentLink($object->comment);
+            $communityHost = parse_url($object->community->actorId, PHP_URL_HOST);
+            $community = "[!{$object->community->name}@{$communityHost}]({$this->linkConverter->convertCommunityLink($object->community)})";
+            $target = "[this comment]({$this->linkConverter->convertCommentLink($object->comment)}) on [this post]({$this->linkConverter->convertPostLink($object->post)}) in {$community}";
             $username = "{$object->creator->name}@" . parse_url($object->creator->actorId, PHP_URL_HOST);
         } elseif ($object instanceof Person) {
-            $target = $this->linkConverter->convertPersonLink($object);
+            $target = "their profile";
             $username = "{$object->name}@" . parse_url($object->actorId, PHP_URL_HOST);
         } elseif ($object instanceof RegistrationApplicationView) {
-            $target = $this->linkConverter->convertPersonLink($object->creator);
+            $target = 'their registration application';
             $username = "{$object->creator->name}@" . parse_url($object->creator->actorId, PHP_URL_HOST);
         } elseif ($object instanceof CommentReportView) {
-            $target = $this->linkConverter->convertCommentLink($object->comment);
+            $communityHost = parse_url($object->community->actorId, PHP_URL_HOST);
+            $community = "[!{$object->community->name}@{$communityHost}]({$this->linkConverter->convertCommunityLink($object->community)})";
+            $target = "[this comment]({$this->linkConverter->convertCommentLink($object->comment)}) on [this post]({$this->linkConverter->convertPostLink($object->post)}) in {$community}";
             $username = "{$object->commentCreator->name}@" . parse_url($object->commentCreator->actorId, PHP_URL_HOST);
         } elseif ($object instanceof PostReportView) {
-            $target = $this->linkConverter->convertPostLink($object->post);
-            $username = "{$object->postCreator->name}@" . parse_url($object->postCreator->actorId, PHP_URL_HOST);
+            $communityHost = parse_url($object->community->actorId, PHP_URL_HOST);
+            $community = "[!{$object->community->name}@{$communityHost}]({$this->linkConverter->convertCommunityLink($object->community)})";
+            $target = "[this post]({$this->linkConverter->convertPostLink($object->post)}) in {$community}";  $username = "{$object->postCreator->name}@" . parse_url($object->postCreator->actorId, PHP_URL_HOST);
         } elseif ($object instanceof LocalUser) {
             $person = $this->api->user()->get($object->personId);
-            $target = $this->linkConverter->convertPersonLink($person);
+            $target = 'their local account';
             $username = "{$person->name}@" . parse_url($person->actorId, PHP_URL_HOST);
         }
 

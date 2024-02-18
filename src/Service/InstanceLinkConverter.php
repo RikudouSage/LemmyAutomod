@@ -6,6 +6,7 @@ use LogicException;
 use Rikudou\LemmyApi\Exception\LemmyApiException;
 use Rikudou\LemmyApi\LemmyApi;
 use Rikudou\LemmyApi\Response\Model\Comment;
+use Rikudou\LemmyApi\Response\Model\Community;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\Model\Post;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -64,5 +65,16 @@ final readonly class InstanceLinkConverter
         }
 
         return "https://{$this->instance}/u/{$person->name}@{$linkHost}";
+    }
+
+    public function convertCommunityLink(Community $community): string
+    {
+        $link = $community->actorId;
+        $linkHost = parse_url($link, PHP_URL_HOST);
+        if ($linkHost === $this->instance) {
+            return $link;
+        }
+
+        return "https://{$this->instance}/u/{$community->name}@{$linkHost}";
     }
 }
