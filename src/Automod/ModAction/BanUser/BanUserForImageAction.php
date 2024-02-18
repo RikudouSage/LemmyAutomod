@@ -57,6 +57,9 @@ final readonly class BanUserForImageAction extends AbstractModAction
             error_log("Failed getting image hash: {$e->getMessage()}, {$e->getTraceAsString()}");
             return FurtherAction::CanContinue;
         }
+        if ($hash === null) {
+            return FurtherAction::CanContinue;
+        }
         foreach ($this->imageRepository->findAll() as $image) {
             $similarity = $this->imageComparator->compareHashStrings($hash, $image->getImageHash());
             if ($similarity < $image->getSimilarityPercent()) {
