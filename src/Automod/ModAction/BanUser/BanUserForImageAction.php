@@ -6,6 +6,7 @@ use App\Automod\ModAction\AbstractModAction;
 use App\Context\Context;
 use App\Enum\FurtherAction;
 use App\Message\BanUserMessage;
+use App\Message\RemovePostMessage;
 use App\Repository\BannedImageRepository;
 use App\Service\ImageFetcher;
 use Override;
@@ -77,6 +78,11 @@ final readonly class BanUserForImageAction extends AbstractModAction
             $this->messageBus->dispatch(new BanUserMessage(user: $object->creator, reason: $image->getReason() ?? '', removePosts: $image->shouldRemoveAll(), removeComments: $image->shouldRemoveAll()), [
                 new DispatchAfterCurrentBusStamp(),
             ]);
+            if (!$image->shouldRemoveAll()) {
+                $this->messageBus->dispatch(new RemovePostMessage(postId: $object->post->id), [
+                    new DispatchAfterCurrentBusStamp(),
+                ]);
+            }
             $reportMessage = "user has been banned because the image in their post is {$similarity}% similar to banned image with ";
             if ($description = $image->getDescription()) {
                 $reportMessage .= "description: {$description}";
