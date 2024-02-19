@@ -7,6 +7,7 @@ use Psr\Cache\CacheItemPoolInterface;
 use SapientPro\ImageComparator\ImageComparator;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
@@ -17,6 +18,7 @@ final readonly class ImageFetcher
         private CacheItemPoolInterface $cache,
         private HttpClientInterface $httpClient,
         private ImageComparator $imageComparator,
+        private MimeTypeGuesserInterface $typeGuesser,
     ) {
     }
 
@@ -33,7 +35,13 @@ final readonly class ImageFetcher
             $cacheItem->set(null);
         } else {
             $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
-            if (str_starts_with($contentType, 'image/')) {
+            $isImage = str_starts_with($contentType, 'image/');
+            if (!$isImage) {
+                $filepath = tempnam(sys_get_temp_dir(), 'lemmy_automod');
+                file_put_contents($filepath, $response->getContent());
+                $isImage = str_starts_with($this->typeGuesser->guessMimeType($filepath), 'image/');
+            }
+            if ($isImage) {
                 try {
                     if ($this->isAnimatedWebP($response->getContent())) {
                         $image = false;

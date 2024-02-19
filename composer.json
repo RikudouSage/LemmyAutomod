@@ -30,6 +30,7 @@
         "symfony/framework-bundle": "7.0.*",
         "symfony/http-client": "7.0.*",
         "symfony/messenger": "7.0.*",
+        "symfony/mime": "7.0.*",
         "symfony/property-access": "7.0.*",
         "symfony/property-info": "7.0.*",
         "symfony/psr-http-message-bridge": "7.0.*",
