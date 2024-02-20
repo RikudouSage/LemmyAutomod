@@ -6,6 +6,8 @@ use App\Automod\ModAction\AbstractModAction;
 use App\Context\Context;
 use App\Entity\TrustedUser;
 use App\Enum\FurtherAction;
+use App\Message\RemoveCommentMessage;
+use App\Message\RemovePostMessage;
 use App\Repository\TrustedUserRepository;
 use App\Service\InstanceLinkConverter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,6 +15,7 @@ use LogicException;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @extends AbstractModAction<CommentReportView|PostReportView>
@@ -25,6 +28,7 @@ final readonly class RemoveReportedFromTrustedUserModAction extends AbstractModA
         private InstanceLinkConverter $linkConverter,
         #[Autowire('%app.lemmy.instance%')]
         private string $instance,
+        private MessageBusInterface $messageBus,
     ) {
     }
 
@@ -64,12 +68,12 @@ final readonly class RemoveReportedFromTrustedUserModAction extends AbstractModA
         );
         if ($object instanceof CommentReportView) {
             $context->addMessage("reported comment ({$this->linkConverter->convertCommentLink($object->comment)}) has been automatically resolved because it was reported by a trusted user ({$reporter})");
-            $this->api->moderator()->removeComment($object->comment, $object->commentReport->reason);
+            $this->messageBus->dispatch(new RemoveCommentMessage($object->comment->id));
             $this->api->moderator()->resolveCommentReport($object->commentReport);
         }
         if ($object instanceof PostReportView) {
             $context->addMessage("reported post ({$this->linkConverter->convertPostLink($object->post)}) has been automatically resolved because it was reported by a trusted user ({$reporter})");
-            $this->api->moderator()->removePost($object->post, $object->postReport->reason);
+            $this->messageBus->dispatch(new RemovePostMessage($object->post->id));
             $this->api->moderator()->resolvePostReport($object->postReport);
         }
 

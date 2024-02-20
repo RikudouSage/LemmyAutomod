@@ -39,9 +39,9 @@ final readonly class BanUserForImageAction extends AbstractModAction
         if (!$object instanceof PostView) {
             return false;
         }
-        if ($object->creator->banned) {
-            return false;
-        }
+//        if ($object->creator->banned) {
+//            return false;
+//        }
         if (!$object->post->url) {
             return false;
         }

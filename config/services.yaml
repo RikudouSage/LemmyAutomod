@@ -68,3 +68,19 @@ services:
     League\CommonMark\CommonMarkConverter:
 
     SapientPro\ImageComparator\ImageComparator:
+
+    app.log_validity:
+        class: DateInterval
+        factory: [App\Service\RemovalLogValidityFactory, createLogValidity]
+        arguments:
+            - '%env(REMOVAL_LOG_VALIDITY)%'
+
+    App\MessageHandler\RemoveCommentHandler:
+        arguments:
+            $removalLogValidity: '@app.log_validity'
+    App\MessageHandler\RemovePostHandler:
+        arguments:
+            $removalLogValidity: '@app.log_validity'
+    App\MessageHandler\UnbanUserHandler:
+        arguments:
+            $removalLogValidity: '@app.log_validity'

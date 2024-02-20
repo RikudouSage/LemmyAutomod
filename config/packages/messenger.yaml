@@ -19,6 +19,7 @@ framework:
             App\Message\BanUserMessage: async
             App\Message\ReanalyzePostsMessage: async
             App\Message\RemoveCommentMessage: async
+            App\Message\RemoveOldRowsMessage: async
             App\Message\RemovePostMessage: async
             App\Message\RestoreCommentMessage: async
             App\Message\RestorePostMessage: async
