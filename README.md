@@ -364,4 +364,4 @@ For example:
 
 `docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\UnbanUserMessage --arg 'MyUsername' --arg 'lemmings.world'`
 
-This will unban them. It will also iterate through all posts and comments and make all their commands and posts visible again. Note this will restore all posts and comments, even if the Automod was not the one that removed them, including posts and comments that the user themselves deleted. So be careful using it.
+This will unban them. It will also iterate through all posts and comments and make all their comments and posts visible again. Note this will restore all posts and comments, even if the Automod was not the one that removed them, including posts and comments that the user themselves deleted. So be careful using it.
