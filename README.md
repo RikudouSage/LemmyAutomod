@@ -39,7 +39,7 @@ Other features:
     * [**4.4** Ban user if content matches regular expression](#44-ban-user-if-content-matches-regular-expression)
     * [**4.5** Report user if content matches regular expression](#45-report-user-if-content-matches-regular-expression)
     * [**4.6** Trusted users](#46-trusted-users)
-    * [**4.7** Ban used if image is the same or similar](#47-ban-used-if-image-is-the-same-or-similar)
+    * [**4.7** Ban user if image is the same or similar](#47-ban-user-if-image-is-the-same-or-similar)
 * [Information](#information)
   * [Table descriptions](#table-descriptions)
   * [Environment variables](#environment-variables)
@@ -250,7 +250,7 @@ You can mark users as trusted users by adding them to the trusted_users table. W
 The following will add the user @trustworthy_user@lemmings.world into the trusted_users table:  
 `insert into trusted_users (username, instance) values ('trustworthy_user', 'lemmings.world');`
 
-### **4.7** Ban used if image is the same or similar
+### **4.7** Ban user if image is the same or similar
 
 By adding an image hash to the `banned_images` table, you can ban any user that posts that image or a similar one.
 
@@ -297,7 +297,7 @@ This section contains descriptions of tables, environment variables, and jobs th
     you can simply provide the `username` and `instance` and the automod will save the `user_id` on
     its own next time it gets any report
 - `banned_images` if an image linked in a post is similar to the image_hash, the user is banned.
-  - `image_hash` - the hash of the image to ban (more below)
+  - `image_hash` - the hash of the image to ban (see [Ban user if image is the same or similar](#47-ban-user-if-image-is-the-same-or-similar))
   - `similarity_percent` - a decimal number between 0 and 100 determining how similar the image must be - 100 means it needs to look exactly the same, 0 means that any image will match
   - `remove_all` - whether to remove all user's posts and comments if the image matches
   - `reason` - the optional reason that will be in the modlog
