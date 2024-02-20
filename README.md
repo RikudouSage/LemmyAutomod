@@ -4,15 +4,18 @@ LemmyAutomod is a tool for Lemmy that allows instance admins to set rules that w
 - Set regular expressions to identify email addresses, usernames, posts, or comments that should cause the user to be instantly banned, or reported for manual review.
 - Optionally remove all posts and comments where a user is auto-banned (set per rule)
 - Mark certain users as "trusted", where if that user reports content, LemmyAutomod will automatically remove the content and resolve the report.
+- Ban a user if they post an image that is the same or similar to an image hash that you generate from an image URL.
 
 Other features:
 - Message selected users on Lemmy when an action has been taken
 - Post to Matrix or Slack chat when an action has been taken
 - Notify when a new user has been added
-- Uses [Lemmy Webhook](https://github.com/RikudouSage/LemmyWebhook) for near instant checking of new content 
+- Uses [Lemmy Webhook](https://github.com/RikudouSage/LemmyWebhook) for near instant checking of new content
 
+# Table of Contents
 <!-- TOC -->
 * [LemmyAutomod](#lemmyautomod)
+* [Table of Contents](#table-of-contents)
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
   * [1. Set up Webhooks](#1-set-up-webhooks)
@@ -36,17 +39,21 @@ Other features:
     * [**4.4** Ban user if content matches regular expression](#44-ban-user-if-content-matches-regular-expression)
     * [**4.5** Report user if content matches regular expression](#45-report-user-if-content-matches-regular-expression)
     * [**4.6** Trusted users](#46-trusted-users)
+    * [**4.7** Ban user if image is the same or similar](#47-ban-user-if-image-is-the-same-or-similar)
 * [Information](#information)
   * [Table descriptions](#table-descriptions)
   * [Environment variables](#environment-variables)
     * [List](#list)
     * [LEMMY_AUTH_MODE environment variable](#lemmy_auth_mode-environment-variable)
-    * [Manually run on specific content](#manually-run-on-specific-content)
+  * [Jobs that can be manually run](#jobs-that-can-be-manually-run)
+    * [Analyze a specific comment or post](#analyze-a-specific-comment-or-post)
+    * [Reanalyze all posts since a point in time](#reanalyze-all-posts-since-a-point-in-time)
+    * [Unban user and restore content](#unban-user-and-restore-content)
 <!-- TOC -->
 # Prerequisites
 To use LemmyAutomod, you will need:
 - Webhooks set up via [Lemmy Webhook](https://github.com/RikudouSage/LemmyWebhook)
-- [LemmyWebhookManager](https://github.com/RikudouSage/LemmyWebhookManager/) set up if you want to set up the Automod webhooks via import. 
+- [LemmyWebhookManager](https://github.com/RikudouSage/LemmyWebhookManager/) set up if you want to set up the Automod webhooks via import.
 - An account set up on your Lemmy instance with admin privileges to act as the Automod
 - Access to the server your Lemmy instance is installed on, to add new containers to the docker compose stack and to directly edit the LemmyAutomod SQLite database to add your rules
 
@@ -81,7 +88,7 @@ Ensure you also add networks that allow the LemmyWebhook to access LemmyAutomod,
 Start LemmyAutomod by running `docker compose up -d`
 
 ### **2.2** Export YAML
-Run the following command to output a YAML file that contains the required webhooks. Ensure you update the container name where needed.  
+Run the following command to output a YAML file that contains the required webhooks. Ensure you update the container name where needed.
 
 `docker exec [lemmy_automod_1] bin/console app:dump`
 
@@ -92,7 +99,7 @@ Once the output has been generated, copy the YML from the output.
 
 ### **2.3** Import webhooks
 Go to the LemmyWebhookManager web interface and log in. In the Webhooks section, choose "Import webhooks", then paste the YML into the provided field.
-Click "Import", and the required webhooks should be automatically added. 
+Click "Import", and the required webhooks should be automatically added.
 
 LemmyWebhook is now set up to trigger LemmyAutomod.
 
@@ -231,7 +238,7 @@ This example has "remove_all" set to false. If you set this to true, it will rem
 
 ### **4.5** Report user if content matches regular expression
 
-This works the same as [Ban user if content matches regular expression](#34-ban-user-if-content-matches-regular-expression) above, but instead of banning the user it will report them for manual review.
+This works the same as [Ban user if content matches regular expression](#44-ban-user-if-content-matches-regular-expression) above, but instead of banning the user it will report them for manual review.
 
 For example. the following will identify comments or posts with the phrase "you're an idiot" and report them for manual review:  
 `insert into report_regexes (regex, message) values ('you\''re an idiot', 'Possible flame war');`
@@ -243,10 +250,26 @@ You can mark users as trusted users by adding them to the trusted_users table. W
 The following will add the user @trustworthy_user@lemmings.world into the trusted_users table:  
 `insert into trusted_users (username, instance) values ('trustworthy_user', 'lemmings.world');`
 
+### **4.7** Ban user if image is the same or similar
+
+By adding an image hash to the `banned_images` table, you can ban any user that posts that image or a similar one.
+
+First, generate the hash by running the following command:  
+`docker exec -it lemmy_automod_1 bin/console app:image:hash [image URL]`
+
+For example:
+`docker exec -it lemmy_automod_1 bin/console app:image:hash https://lemmings.world/pictrs/image/89863158-5c41-4dea-b965-c7b0029cf837.webp?format=webp`
+
+This will output a hash as follows:  
+`1111111100000000001011000010000000100001010000000000011011111111`
+
+Add the hash into the `banned_images` table as follows:  
+`INSERT INTO banned_images (image_hash, similarity_percent, remove_all, reason, description) VALUES ('1111111100000000001011000010000000100001010000000000011011111111', 95, false, 'spammer', 'image containing a can of spam with ctkparr discord link');`
+
 
 # Information
 
-This sectiion contains descriptions of tables, environment variables, and jobs that can be manually run to do various tasks.
+This section contains descriptions of tables, environment variables, and jobs that can be manually run to do various tasks.
 
 ## Table descriptions
 
@@ -271,8 +294,14 @@ This sectiion contains descriptions of tables, environment variables, and jobs t
   - `instance` - the instance, like `lemmings.world`
   - `user_id` - the ID of the user
   - The only field needed is the `user_id`, but if you don't want to go looking in the db for that,
-    you can simply provide the `username` and `instance` and the automod will save the `user_id` on 
+    you can simply provide the `username` and `instance` and the automod will save the `user_id` on
     its own next time it gets any report
+- `banned_images` if an image linked in a post is similar to the image_hash, the user is banned.
+  - `image_hash` - the hash of the image to ban (see [Ban user if image is the same or similar](#47-ban-user-if-image-is-the-same-or-similar))
+  - `similarity_percent` - a decimal number between 0 and 100 determining how similar the image must be - 100 means it needs to look exactly the same, 0 means that any image will match
+  - `remove_all` - whether to remove all user's posts and comments if the image matches
+  - `reason` - the optional reason that will be in the modlog
+  - `description` - optional description of the image, only used for notification reports
 
 ## Environment variables
 
@@ -289,9 +318,13 @@ Here is a list of environment variables and their descriptions:
 | APP_SECRET                    | A random 32 hex characters - you can generate this using the terminal command 'openssl rand -hex 16'.                                                                                                                                                                 |
 | REDIS_HOST                    | Service name for your redis service you would have added for LemmyWebhook.                                                                                                                                                                                            |
 | ENABLE_NEW_USERS_NOTIFICATION | Whether to receive a notification when a new user joins.                                                                                                                                                                                                              |
-| MATRIX_API_TOKEN              | Token for connecting to Matrix for posting to a Matrix chat. See [Notification setup](#notification-setup).                                                                                                                                                           |
-| MATRIX_ROOM_NAMES             | A comma-separated list of Matrix rooms you want the bot to post notifications to. See [Notification setup](#notification-setup).                                                                                                                                      |
-| USE_LEMMYVERSE_LINK_MATRIX    | Whether to use lemmyverse.link when posting links to content or users, which is a universal link that directs users to the content on their own instance.                                                                                                             |
+| MATRIX_API_TOKEN              | Token for connecting to Matrix for posting to a Matrix chat. See [Notification setup](#3-notification-setup-optional).                                                                                                                                                |
+| MATRIX_ROOM_NAMES             | A comma-separated list of Matrix rooms you want the bot to post notifications to. See [Notification setup](#3-notification-setup-optional).                                                                                                                           |
+| USE_LEMMYVERSE_LINK_MATRIX    | Whether to use lemmyverse.link when posting links to content or users on Matrix, which is a universal link that directs users to the content on their own instance.                                                                                                   |
+| SLACK_BOT_TOKEN               | Token for connecting to Slack for posting to a Slack channel. See [Notification setup](#3-notification-setup-optional).                                                                                                                                               |
+| SLACK_CHANNELS                | A comma-separated list of Slack channels you want the bot to post notifications to. See [Notification setup](#3-notification-setup-optional).                                                                                                                         |
+| USE_LEMMYVERSE_LINK_SLACK     | Whether to use lemmyverse.link when posting links to content or users on Slack.                                                                                                                                                                                       |
+| USE_LEMMYVERSE_LINK_LEMMY     | Whether to use lemmyverse.link when posting links to content or users in Lemmy personal messages.                                                                                                                                                                     |
 | LEMMY_AUTH_MODE               | Whether to send the Lemmy authentication as part of the header, body, or both. Sending as the header prevents credentials showing in logs, but is only supported by Lemmy 0.19.0 and up. See [Lemmy Auth Mode](#lemmy_auth_mode-environment-variable) for the options |
 
 ### LEMMY_AUTH_MODE environment variable
@@ -315,8 +348,20 @@ To have the automod check your rules against a specific comment, run:
 
 ### Reanalyze all posts since a point in time
 
-You can start a job to reanalyse all posts since a certain time. This might be helpful if you added a new rule, and want to run this over posts already checked before the rule was in place. To do this, run:  
-`docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\ReanalyzePostsMessage --arg [datetime]`  
+You can start a job to reanalyse all posts since a certain time (including checking image hashes). This might be helpful if you added a new rule, and want to run this over posts already checked before the rule was in place. To do this, run:  
+`docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\ReanalyzePostsMessage --arg [datetime]`
 
 For example:  
 `docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\ReanalyzePostsMessage --arg '2024-02-16T01:00:00+02:00'`
+
+### Unban user and restore content
+
+If you have accidentally banned a user, you can unban them using the website UI, but make sure you first change the rule that banned them otherwise the user may be re-banned. If you've removed their content, you can use the following command to unban and restore content:
+
+`docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\UnbanUserMessage --arg [username] --arg [instance]`
+
+For example:
+
+`docker exec -it lemmy_automod_1 bin/console app:trigger App\\Message\\UnbanUserMessage --arg 'MyUsername' --arg 'lemmings.world'`
+
+This will unban them. It will also iterate through all posts and comments and make all their comments and posts visible again. Note this will restore all posts and comments, even if the Automod was not the one that removed them, including posts and comments that the user themselves deleted. So be careful using it.
