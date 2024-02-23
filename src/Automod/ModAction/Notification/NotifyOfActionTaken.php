@@ -5,6 +5,7 @@ namespace App\Automod\ModAction\Notification;
 use App\Automod\Enum\AutomodPriority;
 use App\Automod\ModAction\ModAction;
 use App\Context\Context;
+use App\Dto\Model\EnrichedInstanceData;
 use App\Dto\Model\LocalUser;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
@@ -21,7 +22,7 @@ use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * @implements ModAction<CommentView|PostView|Person|RegistrationApplicationView>
+ * @implements ModAction<CommentView|PostView|Person|RegistrationApplicationView|EnrichedInstanceData>
  */
 #[AsTaggedItem(priority: AutomodPriority::Notification->value)]
 final readonly class NotifyOfActionTaken implements ModAction
@@ -37,9 +38,14 @@ final readonly class NotifyOfActionTaken implements ModAction
 
     public function shouldRun(object $object): bool
     {
-        return ($object instanceof CommentView || $object instanceof PostView || $object instanceof Person || $object instanceof RegistrationApplicationView)
-            && $this->notificationSender->hasEnabledChannels()
-        ;
+        return (
+                $object instanceof CommentView
+                || $object instanceof PostView
+                || $object instanceof Person
+                || $object instanceof RegistrationApplicationView
+                || $object instanceof EnrichedInstanceData
+            )
+            && $this->notificationSender->hasEnabledChannels();
     }
 
     public function takeAction(object $object, Context $context = new Context()): FurtherAction
@@ -78,13 +84,18 @@ final readonly class NotifyOfActionTaken implements ModAction
             $person = $this->api->user()->get($object->personId);
             $target = 'their local account';
             $username = "{$person->name}@" . parse_url($person->actorId, PHP_URL_HOST);
+        } elseif ($object instanceof EnrichedInstanceData) {
+            $target = 'their federation attempt';
+            $username = $object->instance;
+            $url = "https://{$object->instance}";
         }
 
         if ($target === null || $username === null) {
             return FurtherAction::CanContinue;
         }
+        $url ??= "https://{$this->instance}/u/{$username}";
 
-        $message = "Actions have been taken against [{$username}](https://{$this->instance}/u/{$username}) for {$target}:\n\n";
+        $message = "Actions have been taken against [{$username}]({$url}) for {$target}:\n\n";
 
         foreach ($context->getMessages() as $contextMessage) {
             $message .= " - {$contextMessage}\n";
