@@ -4,6 +4,7 @@ namespace App\Automod;
 
 use App\Automod\ModAction\ModAction;
 use App\Context\Context;
+use App\Dto\Model\EnrichedInstanceData;
 use App\Dto\Model\LocalUser;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
@@ -27,7 +28,7 @@ final readonly class Automod
     }
 
     public function analyze(
-        PostView|CommentView|Person|CommentReportView|PostReportView|RegistrationApplicationView|LocalUser $object
+        PostView|CommentView|Person|CommentReportView|PostReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData $object
     ): void {
         $furtherAction = FurtherAction::CanContinue;
         $context = new Context();
