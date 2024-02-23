@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-final readonly class MastodonInstanceDataEnricher implements InstanceDataEnricher
+final readonly class MisskeyInstanceDataEnricher implements InstanceDataEnricher
 {
     public function __construct(
         private HttpClientInterface $httpClient,
@@ -20,17 +20,20 @@ final readonly class MastodonInstanceDataEnricher implements InstanceDataEnriche
     #[Override]
     public function supports(string $software, string $version): bool
     {
-        $allowed = ['mastodon', 'pixelfed', 'akkoma'];
-        return in_array($software, $allowed, true);
+        return $software === 'misskey';
     }
 
     #[Override]
     public function getEnriched(BasicInstanceData $instanceData): EnrichedInstanceData
     {
-        $url = "https://{$instanceData->instance}/api/v1/instance";
-        $response = $this->httpClient->request(Request::METHOD_GET, $url);
+        $url = "https://{$instanceData->instance}/api/meta";
+        $response = $this->httpClient->request(Request::METHOD_POST, $url, [
+            'json' => [
+                'detail' => false,
+            ],
+        ]);
         if ($response->getStatusCode() !== Response::HTTP_OK) {
-            throw new LogicException('Failed getting instance data');
+            throw new LogicException('Failed getting instance info');
         }
         $json = json_decode($response->getContent(), true, flags: JSON_THROW_ON_ERROR);
 
@@ -39,9 +42,13 @@ final readonly class MastodonInstanceDataEnricher implements InstanceDataEnriche
             software: $instanceData->software,
             version: $instanceData->version,
             openRegistrations: $instanceData->openRegistrations,
-            captcha: null,
-            emailVerification: true,
-            applications: $json['approval_required'] ?? null,
+            captcha: ($json['enableHcaptcha'] ?? false)
+                || ($json['enableRecaptcha'] ?? false)
+                || ($json['enableTurnstile'] ?? false)
+                || ($json['enableMcaptcha'] ?? false)
+            ,
+            emailVerification: $json['emailRequiredForSignup'] ?? null,
+            applications: false,
         );
     }
 }
