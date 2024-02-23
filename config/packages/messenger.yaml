@@ -12,6 +12,7 @@ framework:
         routing:
             App\Message\AnalyzeCommentMessage: async
             App\Message\AnalyzeCommentReportMessage: async
+            App\Message\AnalyzeInstanceMessage: async
             App\Message\AnalyzeLocalUserMessage: async
             App\Message\AnalyzePostMessage: async
             App\Message\AnalyzePostReportMessage: async

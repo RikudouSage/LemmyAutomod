@@ -3,15 +3,17 @@
 namespace App\Controller;
 
 use App\Attribute\WebhookConfig;
+use App\Dto\Model\BasicInstanceData;
 use App\Dto\Model\LocalUser;
+use App\Dto\Request\InstanceFederatedRequest;
 use App\Dto\Request\TriggerIdRequest;
 use App\Message\AnalyzeCommentMessage;
 use App\Message\AnalyzeCommentReportMessage;
+use App\Message\AnalyzeInstanceMessage;
 use App\Message\AnalyzeLocalUserMessage;
 use App\Message\AnalyzePostMessage;
 use App\Message\AnalyzePostReportMessage;
 use App\Message\AnalyzeRegistrationApplicationMessage;
-use App\Message\AnalyzeUserMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -83,6 +85,24 @@ final class TriggerController extends AbstractController
         MessageBusInterface $messageBus,
     ): JsonResponse {
         $messageBus->dispatch(new AnalyzeRegistrationApplicationMessage($request->id));
+        return new JsonResponse(status: Response::HTTP_NO_CONTENT);
+    }
+
+    #[WebhookConfig(
+        bodyExpression: '{instance: data.data.domain}',
+        filterExpression: null,
+        objectType: 'instance',
+        operation: 'INSERT',
+        enhancedFilter: null,
+    )]
+    #[Route('/instance/federated', name: 'app.triggers.instance.federated', methods: [Request::METHOD_POST])]
+    public function newInstanceFederated(
+        #[MapRequestPayload] InstanceFederatedRequest $request,
+        MessageBusInterface $messageBus,
+    ): JsonResponse {
+        $messageBus->dispatch(new AnalyzeInstanceMessage(
+            instance: $request->instance,
+        ));
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
 }
