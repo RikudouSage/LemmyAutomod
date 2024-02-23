@@ -94,13 +94,13 @@ final readonly class DefederateInstanceAction extends AbstractModAction
         $message .= "\n\n";
 
         if ($rule->allowsOpenRegistrationsWithCaptcha()) {
-            $message .= "- instance does have captcha enabled";
+            $message .= "- instance does have captcha enabled\n";
         }
         if ($rule->allowsOpenRegistrationsWithApplication()) {
-            $message .= "- instance does have registration applications enabled";
+            $message .= "- instance does have registration applications enabled\n";
         }
         if ($rule->allowsOpenRegistrationsWithEmailVerification()) {
-            $message .= "- instance does have email verification";
+            $message .= "- instance does have email verification\n";
         }
         $message .= "\n\n";
 
