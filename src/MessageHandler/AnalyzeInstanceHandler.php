@@ -45,12 +45,12 @@ final readonly class AnalyzeInstanceHandler
             applications: null,
         );
 
-        if ($basic->software === null) {
+        if ($basic->software === null || $basic->version === null) {
             return $default;
         }
 
         foreach ($this->enrichers as $enricher) {
-            if ($enricher->supports($basic->software)) {
+            if ($enricher->supports($basic->software, $basic->version)) {
                 return $enricher->getEnriched($basic);
             }
         }

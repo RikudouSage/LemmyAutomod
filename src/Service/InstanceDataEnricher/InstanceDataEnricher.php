@@ -9,6 +9,6 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag(name: 'app.instance_enricher')]
 interface InstanceDataEnricher
 {
-    public function supports(string $software): bool;
+    public function supports(string $software, string $version): bool;
     public function getEnriched(BasicInstanceData $instanceData): EnrichedInstanceData;
 }

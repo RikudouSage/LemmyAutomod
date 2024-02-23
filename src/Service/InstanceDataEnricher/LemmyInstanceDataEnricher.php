@@ -25,7 +25,7 @@ final readonly class LemmyInstanceDataEnricher implements InstanceDataEnricher
     }
 
     #[Override]
-    public function supports(string $software): bool
+    public function supports(string $software, string $version): bool
     {
         return $software === 'lemmy';
     }
