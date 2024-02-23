@@ -45,7 +45,7 @@ final readonly class DefederateInstanceAction extends AbstractModAction
                 return FurtherAction::ShouldAbort;
             }
             if (!$this->matchesMinimumVersion($object, $rule, $context)) {
-                $this->defederate($object, $rule, $context);
+                $this->defederate($object);
                 return FurtherAction::ShouldAbort;
             }
         }
