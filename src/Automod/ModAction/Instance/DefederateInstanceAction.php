@@ -7,9 +7,11 @@ use App\Context\Context;
 use App\Dto\Model\EnrichedInstanceData;
 use App\Entity\InstanceDefederationRule;
 use App\Enum\FurtherAction;
+use App\Message\CensureInstanceOnFediseerMessage;
 use App\Repository\InstanceDefederationRuleRepository;
 use Override;
 use Rikudou\LemmyApi\Response\Model\Instance;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
  * @extends AbstractModAction<EnrichedInstanceData>
@@ -18,6 +20,7 @@ final readonly class DefederateInstanceAction extends AbstractModAction
 {
     public function __construct(
         private InstanceDefederationRuleRepository $ruleRepository,
+        private MessageBusInterface $messageBus,
     ) {
     }
 
@@ -42,10 +45,12 @@ final readonly class DefederateInstanceAction extends AbstractModAction
         foreach ($rules as $rule) {
             if (!$this->matchesOpenRegistrationRequirements($object, $rule, $context)) {
                 $this->defederate($object);
+                $this->censureOnFediseer($object, $rule);
                 return FurtherAction::ShouldAbort;
             }
             if (!$this->matchesMinimumVersion($object, $rule, $context)) {
                 $this->defederate($object);
+                $this->censureOnFediseer($object, $rule);
                 return FurtherAction::ShouldAbort;
             }
         }
@@ -163,5 +168,14 @@ final readonly class DefederateInstanceAction extends AbstractModAction
 
         $context->addMessage("The instance has been defederated from, because the instance version ({$instanceVersion}) does not match your configured minimum ({$rule->getMinimumVersion()})");
         return false;
+    }
+
+    private function censureOnFediseer(EnrichedInstanceData $object, InstanceDefederationRule $rule): void
+    {
+        $this->messageBus->dispatch(new CensureInstanceOnFediseerMessage(
+            domain: $object->instance,
+            reason: $rule->getReason(),
+            evidence: $rule->getEvidence(),
+        ));
     }
 }

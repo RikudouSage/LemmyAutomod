@@ -36,6 +36,12 @@ class InstanceDefederationRule
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $minimumVersion = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $reason = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $evidence = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -121,6 +127,30 @@ class InstanceDefederationRule
     public function setMinimumVersion(?string $minimumVersion): static
     {
         $this->minimumVersion = $minimumVersion;
+
+        return $this;
+    }
+
+    public function getReason(): ?string
+    {
+        return $this->reason;
+    }
+
+    public function setReason(?string $reason): static
+    {
+        $this->reason = $reason;
+
+        return $this;
+    }
+
+    public function getEvidence(): ?string
+    {
+        return $this->evidence;
+    }
+
+    public function setEvidence(?string $evidence): static
+    {
+        $this->evidence = $evidence;
 
         return $this;
     }

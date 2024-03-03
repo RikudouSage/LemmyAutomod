@@ -18,6 +18,7 @@ framework:
             App\Message\AnalyzePostReportMessage: async
             App\Message\AnalyzeUserMessage: async
             App\Message\BanUserMessage: async
+            App\Message\CensureInstanceOnFediseerMessage: async
             App\Message\ReanalyzePostsMessage: async
             App\Message\RemoveCommentMessage: async
             App\Message\RemoveOldRowsMessage: async

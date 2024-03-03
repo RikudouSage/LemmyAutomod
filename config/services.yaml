@@ -25,6 +25,9 @@ parameters:
 
     app.notify.lemmy.lemmyverse_link: '%env(bool:USE_LEMMYVERSE_LINK_LEMMY)%'
 
+    app.fediseer.api: '%env(FEDISEER_API_URL)%'
+    app.fediseer.key: '%env(FEDISEER_API_KEY)%'
+
     app.image_check.regex: '%env(IMAGE_CHECK_REGEX)%'
 
 services:
