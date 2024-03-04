@@ -10,8 +10,7 @@ use App\Message\RemoveCommentMessage;
 use App\Message\RemovePostMessage;
 use App\Repository\TrustedUserRepository;
 use App\Service\InstanceLinkConverter;
-use Doctrine\ORM\EntityManagerInterface;
-use LogicException;
+use App\Service\UserEntityResolver;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -24,11 +23,11 @@ final readonly class RemoveReportedFromTrustedUserModAction extends AbstractModA
 {
     public function __construct(
         private TrustedUserRepository $trustedUserRepository,
-        private EntityManagerInterface $entityManager,
         private InstanceLinkConverter $linkConverter,
         #[Autowire('%app.lemmy.instance%')]
         private string $instance,
         private MessageBusInterface $messageBus,
+        private UserEntityResolver $userEntityResolver,
     ) {
     }
 
@@ -39,20 +38,8 @@ final readonly class RemoveReportedFromTrustedUserModAction extends AbstractModA
         }
 
         $trustedIds = array_map(function (TrustedUser $user) {
-            if ($user->getUserId()) {
-                return $user->getUserId();
-            }
-
-            if ($user->getUsername() && $user->getInstance()) {
-                $id = $this->api->user()->get("{$user->getUsername()}@{$user->getInstance()}")->id;
-                $user->setUserId($id);
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
-
-                return $user->getUserId();
-            }
-
-            throw new LogicException('The user must either have an ID or username and instance');
+            $this->userEntityResolver->resolve($user);
+            return $user->getUserId();
         }, $this->trustedUserRepository->findBy(['enabled' => true]));
 
         return in_array($object->creator->id, $trustedIds, true);
