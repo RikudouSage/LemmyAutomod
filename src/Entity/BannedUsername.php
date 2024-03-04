@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Helper\DisableableEntity;
 use App\Repository\BannedUsernameRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -9,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'banned_usernames')]
 class BannedUsername
 {
+    use DisableableEntity;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

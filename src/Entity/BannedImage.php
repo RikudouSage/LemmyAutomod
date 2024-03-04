@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Helper\DisableableEntity;
 use App\Repository\BannedImageRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Table(name: 'banned_images')]
 class BannedImage
 {
+    use DisableableEntity;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

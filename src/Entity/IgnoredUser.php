@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Helper\DisableableEntity;
 use App\Repository\IgnoredUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -10,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: IgnoredUserRepository::class)]
 class IgnoredUser
 {
+    use DisableableEntity;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
