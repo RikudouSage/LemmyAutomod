@@ -6,6 +6,7 @@ use App\Helper\DisableableEntity;
 use App\Repository\WatchedUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
+#[ORM\Table(name: 'watched_users')]
 #[ORM\Entity(repositoryClass: WatchedUserRepository::class)]
 class WatchedUser implements ResolvableUserEntity
 {
