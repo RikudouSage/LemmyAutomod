@@ -53,7 +53,7 @@ final readonly class RemoveReportedFromTrustedUserModAction extends AbstractModA
             }
 
             throw new LogicException('The user must either have an ID or username and instance');
-        }, $this->trustedUserRepository->findAll());
+        }, $this->trustedUserRepository->findBy(['enabled' => true]));
 
         return in_array($object->creator->id, $trustedIds, true);
     }

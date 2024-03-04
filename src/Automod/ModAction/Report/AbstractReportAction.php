@@ -80,7 +80,7 @@ abstract readonly class AbstractReportAction extends AbstractModAction
             return null;
         }
 
-        $regexes = $this->repository->findAll();
+        $regexes = $this->repository->findBy(['enabled' => true]);
         foreach ($regexes as $regexEntity) {
             $regex = str_replace('@', '\\@', $regexEntity->getRegex());
             $regex = "@{$regex}@";

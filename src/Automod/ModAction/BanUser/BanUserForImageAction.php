@@ -49,7 +49,7 @@ final readonly class BanUserForImageAction extends AbstractModAction
         if (!preg_match($regex, $object->post->url)) {
             return false;
         }
-        if (!count($this->imageRepository->findAll())) {
+        if (!count($this->imageRepository->findBy(['enabled' => true]))) {
             return false;
         }
 
@@ -70,7 +70,7 @@ final readonly class BanUserForImageAction extends AbstractModAction
         if ($hash === null) {
             return FurtherAction::CanContinue;
         }
-        foreach ($this->imageRepository->findAll() as $image) {
+        foreach ($this->imageRepository->findBy(['enabled' => true]) as $image) {
             $similarity = $this->imageComparator->compareHashStrings($hash, $image->getImageHash());
             if ($similarity < $image->getSimilarityPercent()) {
                 continue;

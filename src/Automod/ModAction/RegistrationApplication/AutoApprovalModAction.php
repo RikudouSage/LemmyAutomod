@@ -23,7 +23,7 @@ final readonly class AutoApprovalModAction extends AbstractModAction
         if (!$object instanceof RegistrationApplicationView) {
             return false;
         }
-        $regexes = $this->autoApprovalRegexRepository->findAll();
+        $regexes = $this->autoApprovalRegexRepository->findBy(['enabled' => true]);
         if (!count($regexes)) {
             return false;
         }

@@ -35,7 +35,7 @@ final readonly class IgnoredUserManager
                 }
 
                 return $id;
-            }, $this->repository->findAll());
+            }, $this->repository->findBy(['enabled' => true]));
         } finally {
             $this->entityManager->flush();
         }

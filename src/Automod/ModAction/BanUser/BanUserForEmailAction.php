@@ -35,7 +35,7 @@ final readonly class BanUserForEmailAction extends AbstractModAction
 
     private function findMatchingEmailRegex(string $email): ?BannedEmail
     {
-        foreach ($this->bannedEmailRepository->findAll() as $regexEntity) {
+        foreach ($this->bannedEmailRepository->findBy(['enabled' => true]) as $regexEntity) {
             $regex = str_replace('@', '\\@', $regexEntity->getRegex());
             $regex = "@{$regex}@i";
             if (!preg_match($regex, $email)) {
