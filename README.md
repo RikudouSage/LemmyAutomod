@@ -167,7 +167,34 @@ Recreate the container by running `docker compose up -d`.
 
 ### **3.3** Post to chat room on Slack
 
+You can have LemmyAutoMod post to a slack channel by following the below steps.
 
+#### **3.3.1** Create a new Slack app
+
+Go to https://api.slack.com/apps and click the button `Create an App`, then choose the option `From an app manifest`.
+
+Choose which Workspace you want it to be for.
+
+On the next page, switch to the YAML tab then paste in the Slack manifest available [here](https://github.com/RikudouSage/LemmyAutomod/blob/master/slack.manifest.yaml).
+
+Create the app, then press the button to `Install to workspace`.
+
+Grant access by clicking `Allow`, then in the left-hand menu choose `OAuth & Permissions`.
+
+On this page you will find the `Bot User OAuth Token`, copy this token.
+
+#### **3.3.2** Update environment variables
+
+In your docker-compose file, add the following environment variable under the existing LemmyAutoMod environment variables:
+```
+SLACK_BOT_TOKEN=[paste Bot User OAuth Token here]
+SLACK_CHANNELS=[comma separated channel list]
+USE_LEMMYVERSE_LINK_SLACK=1
+```
+
+`USE_LEMMYVERSE_LINK_SLACK=1` indicates that notifications from the bot to Slack should use lemmyverse.link links for all links so the links are universal, rather than being for a specific instance.
+
+Recreate the container by running `docker compose up -d`.
 
 ### **3.4** New user notifications
 
