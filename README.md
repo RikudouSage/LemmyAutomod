@@ -45,6 +45,7 @@ Other features:
       * [**4.8.2** Registration rules](#482-registration-rules)
       * [**4.8.3** Minimum version](#483-minimum-version)
       * [**4.8.4** Default values](#484-default-values)
+      * [**4.8.5** Sync defederations to Fediseer censures](#485-sync-defederations-to-fediseer-censures)
 * [Information](#information)
   * [Table descriptions](#table-descriptions)
   * [Settings](#settings)
@@ -166,7 +167,34 @@ Recreate the container by running `docker compose up -d`.
 
 ### **3.3** Post to chat room on Slack
 
+You can have LemmyAutoMod post to a slack channel by following the below steps.
 
+#### **3.3.1** Create a new Slack app
+
+Go to https://api.slack.com/apps and click the button `Create an App`, then choose the option `From an app manifest`.
+
+Choose which Workspace you want it to be for.
+
+On the next page, switch to the YAML tab then paste in the Slack manifest available [here](https://github.com/RikudouSage/LemmyAutomod/blob/master/slack.manifest.yaml).
+
+Create the app, then press the button to `Install to workspace`.
+
+Grant access by clicking `Allow`, then in the left-hand menu choose `OAuth & Permissions`.
+
+On this page you will find the `Bot User OAuth Token`, copy this token.
+
+#### **3.3.2** Update environment variables
+
+In your docker-compose file, add the following environment variable under the existing LemmyAutoMod environment variables:
+```
+SLACK_BOT_TOKEN=[paste Bot User OAuth Token here]
+SLACK_CHANNELS=[comma separated channel list]
+USE_LEMMYVERSE_LINK_SLACK=1
+```
+
+`USE_LEMMYVERSE_LINK_SLACK=1` indicates that notifications from the bot to Slack should use lemmyverse.link links for all links so the links are universal, rather than being for a specific instance.
+
+Recreate the container by running `docker compose up -d`.
 
 ### **3.4** New user notifications
 
@@ -339,6 +367,14 @@ For `minimum_version`, if the version is not known then setting `treat_missing_d
 As an example, to defederate from Lemmy instances that have open registrations with no email verification *and* defederate if the registration policy isn't known, use:  
 `INSERT INTO instance_defederation_rules (software, allow_open_registrations, allow_open_registrations_with_email_verification, treat_missing_data_as) values ('lemmy', false, true, false);`
 
+#### **4.8.5** Sync defederations to Fediseer censures
+
+It is possible to automatically sync with [Fediseer](https://fediseer.com/) to add a censure whenever a defederation action is taken.
+
+To do this, add the following to your environment variables in the docker-compose file:
+
+`FEDISEER_API_KEY=[API key here]`
+
 # Information
 
 This section contains descriptions of tables, environment variables, and jobs that can be manually run to do various tasks.
@@ -347,24 +383,30 @@ This section contains descriptions of tables, environment variables, and jobs th
 
 - `auto_approval_regexes` - when a registration application answer matches, it gets approved
   - `regex` - the regex string
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `banned_emails` - when a new local user's email matches the regex, the user is banned
   - `regex` - the regex string
   - `reason` - the reason that will be used for the ban
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `banned_usernames` - when a user has matching username, it gets banned
   - `username` - the regex string (yes, it's really regex, just badly named, will be changed in the future)
   - `reason` - the reason that will be used for the ban
   - `remove_all` - whether all posts and comments should be removed when banning
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `instance_ban_regexes` - when a post (title, body, url, author name, author display name) or comment (content, author name, author display name) matches, the user gets banned and all posts get removed
   - `regex` - the regex string
   - `reason` - the reason that will be used for the ban
   - `remove_all` - whether all posts and comments should be removed when banning
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `report_regexes` - when a post or comment matches this regex, the user will be reported for manual review
   - `regex` - the regex string
   - `message` - the message that will be used as a reason for the report
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `trusted_users` - when any user present in this table makes a report, it gets automatically resolved by removing the post/comment
   - `username` - the local part of the username, like `rikudou`
   - `instance` - the instance, like `lemmings.world`
   - `user_id` - the ID of the user
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
   - The only field needed is the `user_id`, but if you don't want to go looking in the db for that,
     you can simply provide the `username` and `instance` and the automod will save the `user_id` on
     its own next time it gets any report
@@ -374,6 +416,7 @@ This section contains descriptions of tables, environment variables, and jobs th
   - `remove_all` - whether to remove all user's posts and comments if the image matches
   - `reason` - the optional reason that will be in the modlog
   - `description` - optional description of the image, only used for notification reports
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `instance_defederation_rules` - set rules for defederating from instances that meet certain criteria. See [Defederate from instances that meet certain criteria](#48-defederate-from-instances-that-meet-certain-criteria)
   - `software` - the name of the software the instance is running. See [here](#48-defederate-from-instances-that-meet-certain-criteria) for examples.
   - `allow_open_registrations` - if `false`, instance will be defederated if they allow open registration unless one of the other registration rules is marked as `true`. If `null`, the other registration rules are ignored.
@@ -382,6 +425,7 @@ This section contains descriptions of tables, environment variables, and jobs th
   - `allow_open_registrations_with_application` - if `false`, instance will be defederated if they allow registration with applications, unless one of the other registration rules is marked as `true`.
   - `treat_missing_data_as` - if information not available (e.g. Mastodon doesn't say whether it is using a captcha), then this sets a default to use instead. `True`, `False`, or `Null` (default).
   - `minimum_version` - If the server version is less than this (and the software setting matches), the server will be defederated.
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `removal_logs` - this table holds logs of the removals the bot has actioned, and need not be manually modified.
 
 ## Settings
@@ -410,6 +454,7 @@ Here is a list of environment variables and their descriptions:
 | USE_LEMMYVERSE_LINK_LEMMY     | Whether to use lemmyverse.link when posting links to content or users in Lemmy personal messages.                                                                                                                                                                    |
 | LEMMY_AUTH_MODE               | Whether to send the Lemmy authentication as part of the header, body, or both. Sending as the header prevents credentials showing in logs, but is only supported by Lemmy 0.19.0 and up. See [Lemmy Authentication Mode](#lemmy-authentication-mode) for the options |
 | REMOVAL_LOG_VALIDITY          | The amount of time to keep logs of removals, which are used to restore posts. Default is 24 hours.                                                                                                                                                                   |
+| FEDISEER_API_KEY              | API key for fediseer.com, used to automatically create a censure on Fediseer when an instance is defederated by the automod. See [**4.8.5** Sync defederations to Fediseer censures](#485-sync-defederations-to-fediseer-censures).                                  |
 
 
 ### Lemmy authentication mode
