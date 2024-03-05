@@ -3,15 +3,15 @@
 namespace App\Entity;
 
 use App\Helper\DisableableEntity;
-use App\Repository\TrustedUserRepository;
+use App\Repository\WatchedUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\UniqueConstraint(fields: ['username', 'instance'])]
-#[ORM\Table(name: 'trusted_users')]
-#[ORM\Entity(repositoryClass: TrustedUserRepository::class)]
-class TrustedUser implements ResolvableUserEntity
+#[ORM\Table(name: 'watched_users')]
+#[ORM\Entity(repositoryClass: WatchedUserRepository::class)]
+class WatchedUser implements ResolvableUserEntity
 {
     use DisableableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -23,7 +23,7 @@ class TrustedUser implements ResolvableUserEntity
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $instance = null;
 
-    #[ORM\Column(unique: true, nullable: true)]
+    #[ORM\Column(nullable: true)]
     private ?int $userId = null;
 
     public function getId(): ?int

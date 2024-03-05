@@ -2,14 +2,16 @@
 
 namespace App\Entity;
 
+use App\Helper\DisableableEntity;
 use App\Repository\IgnoredUserRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\UniqueConstraint(fields: ['username', 'instance'])]
 #[ORM\Table(name: 'ignored_users')]
 #[ORM\Entity(repositoryClass: IgnoredUserRepository::class)]
-class IgnoredUser
+class IgnoredUser implements ResolvableUserEntity
 {
+    use DisableableEntity;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

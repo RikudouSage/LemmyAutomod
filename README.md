@@ -77,7 +77,7 @@ First, set up [Lemmy Webhook](https://github.com/RikudouSage/LemmyWebhook) as we
 Add the following to your Docker Compose file, and update the environment variables as applicable:
 ```
 automod:
-    image: rikudousage/lemmy-automod
+    image: ghcr.io/rikudousage/lemmy-automod:latest
     environment:
       - LEMMY_USER=Automod # Automod lemmy username
       - LEMMY_INSTANCE=lemmings.world # Automod lemmy instance hostname
