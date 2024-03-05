@@ -383,24 +383,30 @@ This section contains descriptions of tables, environment variables, and jobs th
 
 - `auto_approval_regexes` - when a registration application answer matches, it gets approved
   - `regex` - the regex string
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `banned_emails` - when a new local user's email matches the regex, the user is banned
   - `regex` - the regex string
   - `reason` - the reason that will be used for the ban
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `banned_usernames` - when a user has matching username, it gets banned
   - `username` - the regex string (yes, it's really regex, just badly named, will be changed in the future)
   - `reason` - the reason that will be used for the ban
   - `remove_all` - whether all posts and comments should be removed when banning
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `instance_ban_regexes` - when a post (title, body, url, author name, author display name) or comment (content, author name, author display name) matches, the user gets banned and all posts get removed
   - `regex` - the regex string
   - `reason` - the reason that will be used for the ban
   - `remove_all` - whether all posts and comments should be removed when banning
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `report_regexes` - when a post or comment matches this regex, the user will be reported for manual review
   - `regex` - the regex string
   - `message` - the message that will be used as a reason for the report
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `trusted_users` - when any user present in this table makes a report, it gets automatically resolved by removing the post/comment
   - `username` - the local part of the username, like `rikudou`
   - `instance` - the instance, like `lemmings.world`
   - `user_id` - the ID of the user
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
   - The only field needed is the `user_id`, but if you don't want to go looking in the db for that,
     you can simply provide the `username` and `instance` and the automod will save the `user_id` on
     its own next time it gets any report
@@ -410,6 +416,7 @@ This section contains descriptions of tables, environment variables, and jobs th
   - `remove_all` - whether to remove all user's posts and comments if the image matches
   - `reason` - the optional reason that will be in the modlog
   - `description` - optional description of the image, only used for notification reports
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `instance_defederation_rules` - set rules for defederating from instances that meet certain criteria. See [Defederate from instances that meet certain criteria](#48-defederate-from-instances-that-meet-certain-criteria)
   - `software` - the name of the software the instance is running. See [here](#48-defederate-from-instances-that-meet-certain-criteria) for examples.
   - `allow_open_registrations` - if `false`, instance will be defederated if they allow open registration unless one of the other registration rules is marked as `true`. If `null`, the other registration rules are ignored.
@@ -418,6 +425,7 @@ This section contains descriptions of tables, environment variables, and jobs th
   - `allow_open_registrations_with_application` - if `false`, instance will be defederated if they allow registration with applications, unless one of the other registration rules is marked as `true`.
   - `treat_missing_data_as` - if information not available (e.g. Mastodon doesn't say whether it is using a captcha), then this sets a default to use instead. `True`, `False`, or `Null` (default).
   - `minimum_version` - If the server version is less than this (and the software setting matches), the server will be defederated.
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 - `removal_logs` - this table holds logs of the removals the bot has actioned, and need not be manually modified.
 
 ## Settings
