@@ -8,6 +8,8 @@ use DateTimeInterface;
 use LogicException;
 use ReflectionClass;
 use ReflectionNamedType;
+use Rikudou\LemmyApi\LemmyApi;
+use Rikudou\LemmyApi\Response\Model\Person;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -24,6 +26,7 @@ final class TriggerJobCommand extends Command
 {
     public function __construct(
         private readonly MessageBusInterface $messageBus,
+        private readonly LemmyApi $api,
     ) {
         parent::__construct();
     }
@@ -90,11 +93,16 @@ final class TriggerJobCommand extends Command
                     throw new LogicException('Can only handle single (or nullable) types for construction');
                 }
                 $value = $namedParameters ? $args[$argument->getName()] : $args[$i];
+                $type = $type->getName();
 
-                if (is_a($type->getName(), DateTime::class, true)) {
+                if (is_a($type, DateTime::class, true)) {
                     $value = new DateTime($value);
-                } else if (is_a($type->getName(), DateTimeInterface::class, true)) {
+                } else if (is_a($type, DateTimeInterface::class, true)) {
                     $value = new DateTimeImmutable($value);
+                } else if (is_a($type, Person::class, true)) {
+                    $value = $this->api->user()->get($value);
+                } else if ($type === 'bool') {
+                    $value = $value === 'true';
                 }
 
                 $namedParameters ? ($args[$argument->getName()] = $value) : ($args[$i] = $value);
