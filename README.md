@@ -30,6 +30,8 @@ Other features:
       * [**3.2.2** Create a new Matrix chat room](#322-create-a-new-matrix-chat-room)
       * [**3.2.3** Retrieve access token](#323-retrieve-access-token)
     * [**3.3** Post to chat room on Slack](#33-post-to-chat-room-on-slack)
+      * [**3.3.1** Create a new Slack app](#331-create-a-new-slack-app)
+      * [**3.3.2** Update environment variables](#332-update-environment-variables)
     * [**3.4** New user notifications](#34-new-user-notifications)
     * [**3.5** Test notification](#35-test-notification)
   * [4. Add rules to database](#4-add-rules-to-database)
