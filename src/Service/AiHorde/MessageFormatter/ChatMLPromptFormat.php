@@ -38,6 +38,6 @@ final readonly class ChatMLPromptFormat implements MessageFormatter
 
     public function supports(AiModel $model): bool
     {
-        return in_array($model, [AiModel::Mistral7BOpenHermes], true);
+        return in_array($model, [AiModel::OpenHermesMistral7B], true);
     }
 }
