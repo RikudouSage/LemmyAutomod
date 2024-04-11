@@ -7,12 +7,9 @@ use App\Enum\AiModel;
 use App\Service\AiHorde\AiHorde;
 use App\Service\AiHorde\Message\Message;
 use App\Service\AiHorde\Message\MessageHistory;
-use Closure;
-use LogicException;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
-use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 
-final readonly class ExpressionLanguageAiFunctions implements ExpressionFunctionProviderInterface
+final readonly class ExpressionLanguageAiFunctions extends AbstractExpressionLanguageFunctionProvider
 {
     public function __construct(
         private AiHorde $aiHorde,
@@ -28,11 +25,6 @@ final readonly class ExpressionLanguageAiFunctions implements ExpressionFunction
                 $this->aiAnalyzeFunction(...),
             ),
         ];
-    }
-
-    private function uncompilableFunction(): Closure
-    {
-        return fn () => throw new LogicException('This function cannot be compiled');
     }
 
     private function aiAnalyzeFunction(array $context, string $message, ?string $systemPrompt = null): string

@@ -3,14 +3,11 @@
 namespace App\Service\Expression;
 
 use App\Message\RunExpressionAsyncMessage;
-use Closure;
-use LogicException;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
-use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
-final readonly class ExpressionLanguageFunctions implements ExpressionFunctionProviderInterface
+final readonly class ExpressionLanguageFunctions extends AbstractExpressionLanguageFunctionProvider
 {
     public function __construct(
         private MessageBusInterface $messageBus,
@@ -52,11 +49,6 @@ final readonly class ExpressionLanguageFunctions implements ExpressionFunctionPr
                 $this->catchErrorFunction(...),
             ),
         ];
-    }
-
-    private function uncompilableFunction(): Closure
-    {
-        return fn () => throw new LogicException('This function cannot be compiled');
     }
 
     private function asyncFunction(array $context, string $expression): bool

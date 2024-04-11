@@ -94,4 +94,5 @@ services:
             - registerProvider: ['@App\Service\Expression\ExpressionLanguageFunctions']
             - registerProvider: ['@App\Service\Expression\ExpressionLanguageAiFunctions']
             - registerProvider: ['@App\Service\Expression\ExpressionLanguageStringFunctions']
+            - registerProvider: ['@App\Service\Expression\ExpressionLanguageLemmyFunctions']
     Symfony\Component\ExpressionLanguage\ExpressionLanguage: '@App\Service\Expression\ExpressionLanguage'
