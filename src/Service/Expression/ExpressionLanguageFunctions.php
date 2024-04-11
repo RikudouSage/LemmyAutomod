@@ -12,6 +12,7 @@ final readonly class ExpressionLanguageFunctions extends AbstractExpressionLangu
     public function __construct(
         private MessageBusInterface $messageBus,
         private ExpressionLanguage $expressionLanguage,
+        private ExpressionLanguageNotifier $notifier,
     ) {
     }
 
@@ -47,6 +48,11 @@ final readonly class ExpressionLanguageFunctions extends AbstractExpressionLangu
                 'catchError',
                 $this->uncompilableFunction(),
                 $this->catchErrorFunction(...),
+            ),
+            new ExpressionFunction(
+                'notify',
+                $this->uncompilableFunction(),
+                $this->notifyFunction(...),
             ),
         ];
     }
@@ -113,5 +119,12 @@ final readonly class ExpressionLanguageFunctions extends AbstractExpressionLangu
             $context['exception'] = $exception;
             return $this->expressionLanguage->evaluate($onErrorExpression, $context);
         }
+    }
+
+    private function notifyFunction(array $context, string $message): bool
+    {
+        $this->notifier->currentContext?->addMessage($message);
+
+        return true;
     }
 }
