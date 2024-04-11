@@ -25,6 +25,7 @@ framework:
             App\Message\RemovePostMessage: async
             App\Message\RestoreCommentMessage: async
             App\Message\RestorePostMessage: async
+            App\Message\RunExpressionAsyncMessage: async
             App\Message\SendNotificationAsyncMessage: async
             App\Message\UnbanUserMessage: async
             # Route your messages to the transports
