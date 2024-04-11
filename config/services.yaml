@@ -27,6 +27,7 @@ parameters:
 
     app.fediseer.api: '%env(FEDISEER_API_URL)%'
     app.fediseer.key: '%env(FEDISEER_API_KEY)%'
+    app.ai_horde.api_key: '%env(AI_HORDE_API_KEY)%'
 
     app.image_check.regex: '%env(IMAGE_CHECK_REGEX)%'
 
@@ -88,7 +89,9 @@ services:
         arguments:
             $removalLogValidity: '@app.log_validity'
 
-    App\Service\ExpressionLanguage:
+    App\Service\Expression\ExpressionLanguage:
         calls:
-            - registerProvider: ['@App\Service\ExpressionLanguageFunctions']
-    Symfony\Component\ExpressionLanguage\ExpressionLanguage: '@App\Service\ExpressionLanguage'
+            - registerProvider: ['@App\Service\Expression\ExpressionLanguageFunctions']
+            - registerProvider: ['@App\Service\Expression\ExpressionLanguageAiFunctions']
+            - registerProvider: ['@App\Service\Expression\ExpressionLanguageStringFunctions']
+    Symfony\Component\ExpressionLanguage\ExpressionLanguage: '@App\Service\Expression\ExpressionLanguage'

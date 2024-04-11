@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Expression;
 
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage as SymfonyExpressionLanguage;
 
