@@ -87,3 +87,8 @@ services:
     App\MessageHandler\UnbanUserHandler:
         arguments:
             $removalLogValidity: '@app.log_validity'
+
+    App\Service\ExpressionLanguage:
+        calls:
+            - registerProvider: ['@App\Service\ExpressionLanguageFunctions']
+    Symfony\Component\ExpressionLanguage\ExpressionLanguage: '@App\Service\ExpressionLanguage'

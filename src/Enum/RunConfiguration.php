@@ -2,8 +2,8 @@
 
 namespace App\Enum;
 
-enum RunConfiguration
+enum RunConfiguration: string
 {
-    case Always;
-    case WhenNotAborted;
+    case Always = 'always';
+    case WhenNotAborted = 'not_aborted';
 }
