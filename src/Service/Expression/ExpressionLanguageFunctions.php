@@ -1,15 +1,13 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Expression;
 
 use App\Message\RunExpressionAsyncMessage;
-use Closure;
-use LogicException;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
-use Symfony\Component\ExpressionLanguage\ExpressionFunctionProviderInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Throwable;
 
-final readonly class ExpressionLanguageFunctions implements ExpressionFunctionProviderInterface
+final readonly class ExpressionLanguageFunctions extends AbstractExpressionLanguageFunctionProvider
 {
     public function __construct(
         private MessageBusInterface $messageBus,
@@ -36,21 +34,21 @@ final readonly class ExpressionLanguageFunctions implements ExpressionFunctionPr
                 $this->anyFunction(...),
             ),
             new ExpressionFunction(
-                'and',
+                '_and_',
                 $this->uncompilableFunction(),
                 $this->andFunction(...),
             ),
             new ExpressionFunction(
-                'or',
+                '_or_',
                 $this->uncompilableFunction(),
                 $this->orFunction(...),
             ),
+            new ExpressionFunction(
+                'catchError',
+                $this->uncompilableFunction(),
+                $this->catchErrorFunction(...),
+            ),
         ];
-    }
-
-    private function uncompilableFunction(): Closure
-    {
-        return fn () => throw new LogicException('This function cannot be compiled');
     }
 
     private function asyncFunction(array $context, string $expression): bool
@@ -105,5 +103,15 @@ final readonly class ExpressionLanguageFunctions implements ExpressionFunctionPr
         }
 
         return $result;
+    }
+
+    private function catchErrorFunction(array $context, string $expression, string $onErrorExpression): bool
+    {
+        try {
+            return $this->expressionLanguage->evaluate($expression, $context);
+        } catch (Throwable $exception) {
+            $context['exception'] = $exception;
+            return $this->expressionLanguage->evaluate($onErrorExpression, $context);
+        }
     }
 }

@@ -9,7 +9,7 @@ use App\Dto\Model\LocalUser;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
 use App\Repository\ComplexRuleRepository;
-use App\Service\ExpressionLanguage;
+use App\Service\Expression\ExpressionLanguage;
 use LogicException;
 use Rikudou\LemmyApi\LemmyApi;
 use Rikudou\LemmyApi\Response\Model\Person;
