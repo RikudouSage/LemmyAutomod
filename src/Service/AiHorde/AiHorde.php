@@ -28,7 +28,7 @@ final readonly class AiHorde
         string $message,
         AiModel $model,
         MessageHistory $history = new MessageHistory(),
-    ): string {
+    ): Message {
         if (!$this->apiKey) {
             throw new LogicException('There is no api key set, cannot use AI actions');
         }
@@ -74,9 +74,7 @@ final readonly class AiHorde
             throw new LogicException('Missing generations output');
         }
 
-        $output = $formatter->formatOutput($json['generations'][0]['text']);
-
-        return $output->content;
+        return $formatter->formatOutput($json['generations'][0]['text']);
     }
 
     /**
@@ -115,7 +113,7 @@ final readonly class AiHorde
                     fn (string $modelName) => fnmatch("*/{$model->value}", $modelName),
                 )) > 0,
         );
-        $targetLength = 1024;
+        $targetLength = 512;
         $targetContext = 2048;
 
         if (!count(array_filter($workers, fn(array $worker) => $worker['max_length'] >= $targetLength))) {
