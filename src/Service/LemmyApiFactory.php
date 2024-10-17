@@ -38,6 +38,7 @@ final readonly class LemmyApiFactory
             httpClient: $this->httpClient,
             requestFactory: $this->requestFactory,
             authMode: $authMode,
+            strictDeserialization: false,
         );
         $item = $this->cache->getItem('app.jwt');
         if ($item->isHit()) {
