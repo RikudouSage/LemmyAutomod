@@ -41,18 +41,23 @@ Other features:
     * [**4.4** Ban user if content matches regular expression](#44-ban-user-if-content-matches-regular-expression)
     * [**4.5** Report user if content matches regular expression](#45-report-user-if-content-matches-regular-expression)
     * [**4.6** Trusted users](#46-trusted-users)
-    * [**4.7** Ban user if image is the same or similar](#47-ban-user-if-image-is-the-same-or-similar)
-    * [**4.8** Defederate from instances that meet certain criteria](#48-defederate-from-instances-that-meet-certain-criteria)
-      * [**4.8.1** Software](#481-software)
-      * [**4.8.2** Registration rules](#482-registration-rules)
-      * [**4.8.3** Minimum version](#483-minimum-version)
-      * [**4.8.4** Default values](#484-default-values)
-      * [**4.8.5** Sync defederations to Fediseer censures](#485-sync-defederations-to-fediseer-censures)
+    * [**4.7** Watched users](#47-watched-users)
+    * [**4.8** Ban user if image is the same or similar](#48-ban-user-if-image-is-the-same-or-similar)
+    * [**4.9** Defederate from instances that meet certain criteria](#49-defederate-from-instances-that-meet-certain-criteria)
+      * [**4.9.1** Software](#491-software)
+      * [**4.9.2** Registration rules](#492-registration-rules)
+      * [**4.9.3** Minimum version](#493-minimum-version)
+      * [**4.9.4** Default values](#494-default-values)
+      * [**4.9.5** Sync defederations to Fediseer censures](#495-sync-defederations-to-fediseer-censures)
 * [Information](#information)
   * [Table descriptions](#table-descriptions)
   * [Settings](#settings)
     * [Environment variable list](#environment-variable-list)
     * [Lemmy authentication mode](#lemmy-authentication-mode)
+  * [Ignored content](#ignored-content)
+    * [Ignore post](#ignore-post)
+    * [Ignore comment](#ignore-comment)
+    * [Ignore user](#ignore-user)
   * [Jobs that can be manually run](#jobs-that-can-be-manually-run)
     * [Restoration of accidentally removed posts](#restoration-of-accidentally-removed-posts)
     * [Analyze a specific comment or post](#analyze-a-specific-comment-or-post)
@@ -169,7 +174,7 @@ Recreate the container by running `docker compose up -d`.
 
 ### **3.3** Post to chat room on Slack
 
-You can have LemmyAutoMod post to a slack channel by following the below steps.
+You can have LemmyAutoMod post to a Slack channel by following the below steps.
 
 #### **3.3.1** Create a new Slack app
 
@@ -286,7 +291,14 @@ You can mark users as trusted users by adding them to the trusted_users table. W
 The following will add the user @trustworthy_user@lemmings.world into the trusted_users table:  
 `insert into trusted_users (username, instance) values ('trustworthy_user', 'lemmings.world');`
 
-### **4.7** Ban user if image is the same or similar
+### **4.7** Watched users
+
+You can mark users to watch by adding them to the watched_users table. When any user present in this table creates a post or comment, you will be notified on the channels you have set up for notifications.
+
+The following will add the user @watched_user@lemmings.world into the trusted_users table:  
+`insert into watched_users (username, instance) values ('watched_user', 'lemmings.world');`
+
+### **4.8** Ban user if image is the same or similar
 
 By adding an image hash to the `banned_images` table, you can ban any user that posts that image or a similar one.
 
@@ -302,7 +314,7 @@ This will output a hash as follows:
 Add the hash into the `banned_images` table as follows:  
 `INSERT INTO banned_images (image_hash, similarity_percent, remove_all, reason, description) VALUES ('1111111100000000001011000010000000100001010000000000011011111111', 95, false, 'spammer', 'image containing a can of spam with ctkparr discord link');`
 
-### **4.8** Defederate from instances that meet certain criteria
+### **4.9** Defederate from instances that meet certain criteria
 
 You can set rules that allow you to automatically defederate from instances based on either their registration rules, or their software version. You can also filter the rule by the software it uses. Currently, re-federation must be done manually (e.g. if the out of date instance is brought up to date, the Automod won't re-enable federation).
 
@@ -316,7 +328,7 @@ In general, fields not set are ignored. Not setting the software will cause the 
 
 More detail follows.
 
-#### **4.8.1** Software
+#### **4.9.1** Software
 
 The software field is taken from the data received from the server, and may change depending on the server sending it. For some software, it will be null.
 
@@ -336,7 +348,7 @@ There are many more, this value is in the `software` column of the `instance` ta
 
 You can also use a value of `null` to match any software.
 
-#### **4.8.2** Registration rules
+#### **4.9.2** Registration rules
 
 There are four fields that control defederation based on the setting for creating new accounts. If registration is closed, the server will not be defederated based on these rules (but may be defederated based on the version).
 
@@ -351,14 +363,14 @@ If `allow_open_registrations` is set to false, then instances that allow open re
 As an example, to defederate from Lemmy instances that have open registrations with no email verification, use this rule:  
 `INSERT INTO instance_defederation_rules (software, allow_open_registrations, allow_open_registrations_with_email_verification) values ('lemmy', false, true);`
 
-#### **4.8.3** Minimum version
+#### **4.9.3** Minimum version
 
 You can defederate instances whose version is below a minimum you set. This version check uses the [PHP version_compare](https://www.php.net/manual/en/function.version-compare.php) function.
 
 To defederate from instances that are running a version of Lemmy under 18.0, you could add:  
 `INSERT INTO instance_defederation_rules (software, minimum_version) values ('lemmy', '0.18.0');`
 
-#### **4.8.4** Default values
+#### **4.9.4** Default values
 
 If information from the remote instance does not exist (for example, it does not state its registration policy, or does not provide its version) then you can set a default. This is set in the field `treat_missing_data_as`.
 
@@ -369,7 +381,7 @@ For `minimum_version`, if the version is not known then setting `treat_missing_d
 As an example, to defederate from Lemmy instances that have open registrations with no email verification *and* defederate if the registration policy isn't known, use:  
 `INSERT INTO instance_defederation_rules (software, allow_open_registrations, allow_open_registrations_with_email_verification, treat_missing_data_as) values ('lemmy', false, true, false);`
 
-#### **4.8.5** Sync defederations to Fediseer censures
+#### **4.9.5** Sync defederations to Fediseer censures
 
 It is possible to automatically sync with [Fediseer](https://fediseer.com/) to add a censure whenever a defederation action is taken.
 
@@ -413,14 +425,14 @@ This section contains descriptions of tables, environment variables, and jobs th
     you can simply provide the `username` and `instance` and the automod will save the `user_id` on
     its own next time it gets any report
 - `banned_images` - if an image linked in a post is similar to the image_hash, the user is banned.
-  - `image_hash` - the hash of the image to ban (see [Ban user if image is the same or similar](#47-ban-user-if-image-is-the-same-or-similar))
+  - `image_hash` - the hash of the image to ban (see [Ban user if image is the same or similar](#48-ban-user-if-image-is-the-same-or-similar))
   - `similarity_percent` - a decimal number between 0 and 100 determining how similar the image must be - 100 means it needs to look exactly the same, 0 means that any image will match
   - `remove_all` - whether to remove all user's posts and comments if the image matches
   - `reason` - the optional reason that will be in the modlog
   - `description` - optional description of the image, only used for notification reports
   - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
-- `instance_defederation_rules` - set rules for defederating from instances that meet certain criteria. See [Defederate from instances that meet certain criteria](#48-defederate-from-instances-that-meet-certain-criteria)
-  - `software` - the name of the software the instance is running. See [here](#48-defederate-from-instances-that-meet-certain-criteria) for examples.
+- `instance_defederation_rules` - set rules for defederating from instances that meet certain criteria. See [Defederate from instances that meet certain criteria](#49-defederate-from-instances-that-meet-certain-criteria)
+  - `software` - the name of the software the instance is running. See [here](#49-defederate-from-instances-that-meet-certain-criteria) for examples.
   - `allow_open_registrations` - if `false`, instance will be defederated if they allow open registration unless one of the other registration rules is marked as `true`. If `null`, the other registration rules are ignored.
   - `allow_open_registrations_with_captcha` - if `false`, instance will be defederated if they allow open registration with captcha, unless one of the other registration rules is marked as `true`.
   - `allow_open_registrations_with_email_verification` - if `false`, instance will be defederated if they allow open registration with email verification, unless one of the other registration rules is marked as `true`.
@@ -428,6 +440,26 @@ This section contains descriptions of tables, environment variables, and jobs th
   - `treat_missing_data_as` - if information not available (e.g. Mastodon doesn't say whether it is using a captcha), then this sets a default to use instead. `True`, `False`, or `Null` (default).
   - `minimum_version` - If the server version is less than this (and the software setting matches), the server will be defederated.
   - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
+- `ignored_posts` - mark posts as ignored so the rules don't apply to the post
+  - `post_id` - the post ID as an integer
+- `ignored_comments` - mark comments as ignored so the rules don't apply to the comment
+  - `comment_id` - the comment ID as an integer
+- `ignored_users` - don't check rules against this user, ban them, or remove their content
+  - `username` - the local part of the username, like `rikudou`
+  - `instance` - the instance, like `lemmings.world`
+  - `user_id` - the ID of the user
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
+  - The only field needed is the `user_id`, but if you don't want to go looking in the db for that,
+    you can simply provide the `username` and `instance` and the automod will save the `user_id` on
+    its own next time it is triggered
+- `watched_users` - Add a user here to be notified when they post or comment.
+  - `username` - the local part of the username, like `rikudou`
+  - `instance` - the instance, like `lemmings.world`
+  - `user_id` - the ID of the user
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
+  - The only field needed is the `user_id`, but if you don't want to go looking in the db for that,
+    you can simply provide the `username` and `instance` and the automod will save the `user_id` on
+    its own next time it is triggered
 - `removal_logs` - this table holds logs of the removals the bot has actioned, and need not be manually modified.
 
 ## Settings
@@ -456,7 +488,7 @@ Here is a list of environment variables and their descriptions:
 | USE_LEMMYVERSE_LINK_LEMMY     | Whether to use lemmyverse.link when posting links to content or users in Lemmy personal messages.                                                                                                                                                                    |
 | LEMMY_AUTH_MODE               | Whether to send the Lemmy authentication as part of the header, body, or both. Sending as the header prevents credentials showing in logs, but is only supported by Lemmy 0.19.0 and up. See [Lemmy Authentication Mode](#lemmy-authentication-mode) for the options |
 | REMOVAL_LOG_VALIDITY          | The amount of time to keep logs of removals, which are used to restore posts. Default is 24 hours.                                                                                                                                                                   |
-| FEDISEER_API_KEY              | API key for fediseer.com, used to automatically create a censure on Fediseer when an instance is defederated by the automod. See [**4.8.5** Sync defederations to Fediseer censures](#485-sync-defederations-to-fediseer-censures).                                  |
+| FEDISEER_API_KEY              | API key for fediseer.com, used to automatically create a censure on Fediseer when an instance is defederated by the automod. See [**4.8.5** Sync defederations to Fediseer censures](#495-sync-defederations-to-fediseer-censures).                                  |
 
 
 ### Lemmy authentication mode
@@ -466,6 +498,37 @@ The options are as follows:
 - `2` - send auth as part of body (supports Lemmy < 0.19)
 - `4` - send auth as a header (supports Lemmy >= 0.19)
 - `6` - send auth both as part of body and as a part of header (supports both Lemmy < 0.19 and >= 0.19).
+
+## Ignored content
+
+Sometimes your rules may catch content that you want to let through, but you don't want to update the rule. For example, when a legitimate user posts content from a spam site. There are some options to ignore certain content to prevent the automod re-banning the user when you try to un-ban them.
+
+### Ignore post
+
+You can add a post to the `ignored_posts` table. The post will be ignored when rules are checked. You can add a post as follows:
+`insert into ignored_posts (post_id) values (12345)`
+
+The `post_id` can be copied from the URL of the post.
+
+### Ignore comment
+
+You can add a comment to the `ignored_comments` table. The comment will be ignored when rules are checked. You can add a comment as follows:
+`insert into ignored_comments (comment_id) values (12345)`
+
+The `comment_id` is not easy to retrieve from the default Lemmy website, unless the comment is a top-level comment where you can get it from the comment link. 
+
+You can use your browser to inspect the comment element, where you will see the ID of the element includes the ID, such as `comment-8696754`.
+
+Alternatively an API call may be easier, many of which can be done in your browser. If the comment is recent, it may be easiest to find the comment ID on the user's profile. To do this, for the user 'myLemmyUserAccount@lemmings.world', in your browser go to:
+`https://lemmings.world/api/v3/user?username=myLemmyUserAccount@lemmings.world`, find the content in the returned data, and look for the comment ID of the relevant comment.
+
+### Ignore user
+
+You can add a user to the `ignored_users` table. All rules will be ignored for content posted by this user. If you know the user ID, you can add the user as follows:
+`insert into ignored_users (user_id) values (12345)`
+
+If you don't know the user ID, you can add the user `myLemmyUserAccount@lemmings.world` as follows:
+`insert into ignored_users (username, instance) values ('myLemmyUserAccount', 'lemmings.world)`
 
 ## Jobs that can be manually run
 
