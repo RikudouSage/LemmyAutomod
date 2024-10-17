@@ -14,7 +14,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-configure gd --with-webp --with-jpeg && \
     docker-php-ext-install gd intl opcache pcntl pdo pdo_pgsql && \
-    pecl install redis && \
+    pecl install redis-6.0.2 && \
     docker-php-ext-enable redis
 RUN a2enmod rewrite
 
