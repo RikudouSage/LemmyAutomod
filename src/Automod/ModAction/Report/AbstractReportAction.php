@@ -7,6 +7,9 @@ use App\Context\Context;
 use App\Entity\ReportRegex;
 use App\Enum\FurtherAction;
 use App\Repository\ReportRegexRepository;
+use App\Service\InstanceLinkConverter;
+use App\Service\Notification\NotificationSender;
+use LogicException;
 use Rikudou\LemmyApi\Response\View\CommentView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -18,6 +21,8 @@ use Symfony\Contracts\Service\Attribute\Required;
 abstract readonly class AbstractReportAction extends AbstractModAction
 {
     private ReportRegexRepository $repository;
+    private NotificationSender $notificationSender;
+    private InstanceLinkConverter $linkConverter;
 
     /**
      * @param TObject $object
@@ -34,6 +39,17 @@ abstract readonly class AbstractReportAction extends AbstractModAction
     public function setRegexRepository(ReportRegexRepository $repository): void
     {
         $this->repository = $repository;
+    }
+
+    #[Required]
+    public function setNotificationSender(NotificationSender $notificationSender): void
+    {
+        $this->notificationSender = $notificationSender;
+    }
+
+    public function setLinkConverter(InstanceLinkConverter $linkConverter): void
+    {
+        $this->linkConverter = $linkConverter;
     }
 
     public function shouldRun(object $object): bool
@@ -65,9 +81,13 @@ abstract readonly class AbstractReportAction extends AbstractModAction
                 continue;
             }
 
-            $context->addMessage("content has been reported for matching regex `{$rule->getRegex()}`");
 
-            $this->report($object, $rule->getMessage());
+            if ($rule->isPrivate()) {
+                $this->reportPrivately($object, $rule->getMessage());
+            } else {
+                $context->addMessage("content has been reported for matching regex `{$rule->getRegex()}`");
+                $this->report($object, $rule->getMessage());
+            }
             break;
         }
 
@@ -92,5 +112,21 @@ abstract readonly class AbstractReportAction extends AbstractModAction
         }
 
         return null;
+    }
+
+    /**
+     * @param TObject $object
+     */
+    private function reportPrivately(object $object, string $message): void
+    {
+        if ($object instanceof PostView) {
+            $link = $this->linkConverter->convertPostLink($object->post);
+        } else if ($object instanceof CommentView) {
+            $link = $this->linkConverter->convertCommentLink($object->comment);
+        } else {
+            throw new LogicException('Uncovered case: ' . $object::class);
+        }
+
+        $this->notificationSender->sendNotificationAsync("An automated report for {$link}: {$message}");
     }
 }

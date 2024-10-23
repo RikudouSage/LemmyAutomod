@@ -23,6 +23,9 @@ class ReportRegex
     #[ORM\Column(type: Types::TEXT)]
     private string $message = 'Reported by an automated rule, please check manually.';
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $private = false;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -48,6 +51,18 @@ class ReportRegex
     public function setMessage(string $message): static
     {
         $this->message = $message;
+
+        return $this;
+    }
+
+    public function isPrivate(): bool
+    {
+        return $this->private;
+    }
+
+    public function setPrivate(bool $private): static
+    {
+        $this->private = $private;
 
         return $this;
     }
