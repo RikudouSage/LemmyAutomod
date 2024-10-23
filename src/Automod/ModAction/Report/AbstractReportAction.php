@@ -47,6 +47,7 @@ abstract readonly class AbstractReportAction extends AbstractModAction
         $this->notificationSender = $notificationSender;
     }
 
+    #[Required]
     public function setLinkConverter(InstanceLinkConverter $linkConverter): void
     {
         $this->linkConverter = $linkConverter;
