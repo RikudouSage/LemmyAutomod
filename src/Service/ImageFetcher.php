@@ -21,7 +21,7 @@ final readonly class ImageFetcher
         private HttpClientInterface $httpClient,
         private ImageComparator $imageComparator,
         private MimeTypeGuesserInterface $typeGuesser,
-        #[Autowire('app.image_check.max_size')]
+        #[Autowire('%app.image_check.max_size%')]
         private int $maxSize,
     ) {
     }
