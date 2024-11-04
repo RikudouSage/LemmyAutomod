@@ -5,6 +5,7 @@ namespace App\Service;
 use DateInterval;
 use Psr\Cache\CacheItemPoolInterface;
 use SapientPro\ImageComparator\ImageComparator;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Mime\MimeTypeGuesserInterface;
@@ -20,6 +21,8 @@ final readonly class ImageFetcher
         private HttpClientInterface $httpClient,
         private ImageComparator $imageComparator,
         private MimeTypeGuesserInterface $typeGuesser,
+        #[Autowire('app.image_check.max_size')]
+        private int $maxSize,
     ) {
     }
 
@@ -32,7 +35,7 @@ final readonly class ImageFetcher
         }
 
         $response = $this->httpClient->request(Request::METHOD_GET, $url);
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300 || strlen($response->getContent()) > $this->maxSize) {
             $cacheItem->set(null);
         } else {
             $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
@@ -70,7 +73,7 @@ final readonly class ImageFetcher
         }
 
         $response = $this->httpClient->request(Request::METHOD_GET, $url);
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300 || strlen($response->getContent()) > $this->maxSize) {
             $cacheItem->set(null);
         } else {
             $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
