@@ -12,6 +12,7 @@
         "bref/bref": "^2.1",
         "bref/symfony-bridge": "^1.0",
         "bref/symfony-messenger": "^1.1",
+        "chillerlan/php-qrcode": "^5.0",
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^2.17",

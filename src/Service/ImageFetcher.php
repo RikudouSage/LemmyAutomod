@@ -21,6 +21,8 @@ final readonly class ImageFetcher
         private HttpClientInterface $httpClient,
         private ImageComparator $imageComparator,
         private MimeTypeGuesserInterface $typeGuesser,
+        private ImageManipulator $imageManipulator,
+        private QrImageDetector $qrImageDetector,
         #[Autowire('%app.image_check.max_size%')]
         private int $maxSize,
     ) {
@@ -49,8 +51,23 @@ final readonly class ImageFetcher
                 $filepath = tempnam(sys_get_temp_dir(), 'lemmy_automod');
                 file_put_contents($filepath, $response->getContent());
 
-                $qrCodeReader = new QrReader($filepath);
-                $text = $qrCodeReader->text() ?: null;
+                $text = $this->qrImageDetector->getQrCodeContent($filepath);
+
+                if ($text === null) {
+                    file_put_contents($filepath, $this->imageManipulator->invertColors($response->getContent()));
+                    $text = $this->qrImageDetector->getQrCodeContent($filepath);
+                }
+
+                if ($text === null) {
+                    file_put_contents($filepath, $this->imageManipulator->blackAndWhite($response->getContent()));
+                    $text = $this->qrImageDetector->getQrCodeContent($filepath);
+                }
+
+                if ($text === null) {
+                    file_put_contents($filepath, $this->imageManipulator->blackAndWhite($this->imageManipulator->invertColors($response->getContent())));
+                    $text = $this->qrImageDetector->getQrCodeContent($filepath);
+                }
+
                 $cacheItem->set($text);
             }
         }
