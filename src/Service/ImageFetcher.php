@@ -58,15 +58,15 @@ final readonly class ImageFetcher
                     $text = $this->qrImageDetector->getQrCodeContent($filepath);
                 }
 
-                if ($text === null) {
-                    file_put_contents($filepath, $this->imageManipulator->blackAndWhite($response->getContent()));
-                    $text = $this->qrImageDetector->getQrCodeContent($filepath);
-                }
-
-                if ($text === null) {
-                    file_put_contents($filepath, $this->imageManipulator->blackAndWhite($this->imageManipulator->invertColors($response->getContent())));
-                    $text = $this->qrImageDetector->getQrCodeContent($filepath);
-                }
+//                if ($text === null) {
+//                    file_put_contents($filepath, $this->imageManipulator->blackAndWhite($response->getContent()));
+//                    $text = $this->qrImageDetector->getQrCodeContent($filepath);
+//                }
+//
+//                if ($text === null) {
+//                    file_put_contents($filepath, $this->imageManipulator->blackAndWhite($this->imageManipulator->invertColors($response->getContent())));
+//                    $text = $this->qrImageDetector->getQrCodeContent($filepath);
+//                }
 
                 $cacheItem->set($text);
             }
