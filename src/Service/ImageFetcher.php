@@ -11,6 +11,7 @@ use Symfony\Component\Mime\MimeTypeGuesserInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Throwable;
+use Zxing\QrReader;
 
 final readonly class ImageFetcher
 {
@@ -20,6 +21,44 @@ final readonly class ImageFetcher
         private ImageComparator $imageComparator,
         private MimeTypeGuesserInterface $typeGuesser,
     ) {
+    }
+
+    public function getImageQrCodeContent(string $url): ?string
+    {
+        $cacheKey = "image.qr." . str_replace(str_split(ItemInterface::RESERVED_CHARACTERS), '_', $url);
+        $cacheItem = $this->cache->getItem($cacheKey);
+        if ($cacheItem->isHit()) {
+            return $cacheItem->get();
+        }
+
+        $response = $this->httpClient->request(Request::METHOD_GET, $url);
+        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300) {
+            $cacheItem->set(null);
+        } else {
+            $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
+            $isImage = str_starts_with($contentType, 'image/');
+            if (!$isImage) {
+                $filepath = tempnam(sys_get_temp_dir(), 'lemmy_automod');
+                file_put_contents($filepath, $response->getContent());
+                $isImage = str_starts_with($this->typeGuesser->guessMimeType($filepath), 'image/');
+            }
+            if ($isImage) {
+                $filepath = tempnam(sys_get_temp_dir(), 'lemmy_automod');
+                file_put_contents($filepath, $response->getContent());
+
+                $qrCodeReader = new QrReader($filepath);
+                $text = $qrCodeReader->text() ?: null;
+                $cacheItem->set($text);
+            }
+        }
+
+        if (!$cacheItem->get()) {
+            $cacheItem->set(null);
+        }
+        $cacheItem->expiresAfter(new DateInterval('P7D'));
+        $this->cache->save($cacheItem);
+
+        return $cacheItem->get();
     }
 
     public function getImageHash(string $url): ?string

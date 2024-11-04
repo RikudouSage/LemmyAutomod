@@ -8,6 +8,7 @@ use App\Enum\FurtherAction;
 use App\Message\BanUserMessage;
 use App\Message\RemovePostMessage;
 use App\Repository\BannedImageRepository;
+use App\Repository\BannedQrCodeRepository;
 use App\Service\ImageFetcher;
 use Override;
 use Rikudou\LemmyApi\Response\View\PostView;
@@ -25,6 +26,7 @@ final readonly class BanUserForImageAction extends AbstractModAction
 {
     public function __construct(
         private BannedImageRepository $imageRepository,
+        private BannedQrCodeRepository $qrCodeRepository,
         private ImageFetcher $imageFetcher,
         private ImageComparator $imageComparator,
         private MessageBusInterface $messageBus,
@@ -49,7 +51,10 @@ final readonly class BanUserForImageAction extends AbstractModAction
         if (!preg_match($regex, $object->post->url)) {
             return false;
         }
-        if (!count($this->imageRepository->findBy(['enabled' => true]))) {
+        if (
+            !count($this->imageRepository->findBy(['enabled' => true]))
+            && !count($this->qrCodeRepository->findAll())
+        ) {
             return false;
         }
 
@@ -59,16 +64,31 @@ final readonly class BanUserForImageAction extends AbstractModAction
     #[Override]
     public function takeAction(object $object, Context $context = new Context()): FurtherAction
     {
+        $result = $this->banForImageHash($object, $context);
+        if ($result !== null) {
+            return $result;
+        }
+
+        $result = $this->banForQrCode($object, $context);
+        if ($result !== null) {
+            return $result;
+        }
+
+        return FurtherAction::CanContinue;
+    }
+
+    private function banForImageHash(PostView $object, Context $context): ?FurtherAction
+    {
         try {
             $hash = $this->imageFetcher->getImageHash($object->post->url);
         } catch (ExceptionInterface) {
-            return FurtherAction::CanContinue;
+            return null;
         } catch (Throwable $e) {
             error_log("Failed getting image hash: {$e->getMessage()}, {$e->getTraceAsString()}");
-            return FurtherAction::CanContinue;
+            return null;
         }
         if ($hash === null) {
-            return FurtherAction::CanContinue;
+            return null;
         }
         foreach ($this->imageRepository->findBy(['enabled' => true]) as $image) {
             $similarity = $this->imageComparator->compareHashStrings($hash, $image->getImageHash());
@@ -94,7 +114,43 @@ final readonly class BanUserForImageAction extends AbstractModAction
             return FurtherAction::ShouldAbort;
         }
 
-        // this shouldn't really happen, but just to be sure
-        return FurtherAction::ShouldAbort;
+        return null;
+    }
+
+    private function banForQrCode(PostView $object, Context $context): ?FurtherAction
+    {
+        try {
+            $qrText = $this->imageFetcher->getImageQrCodeContent($object->post->url);
+        } catch (ExceptionInterface) {
+            return null;
+        } catch (Throwable $e) {
+            error_log("Failed getting image qr code content: {$e->getMessage()}, {$e->getTraceAsString()}");
+            return null;
+        }
+        if ($qrText === null) {
+            return null;
+        }
+        foreach ($this->qrCodeRepository->findAll() as $rule) {
+            $regex = str_replace('@', '\\@', $rule->getRegex());
+            $regex = "@{$regex}@i";
+            if (!preg_match($regex, $qrText)) {
+                continue;
+            }
+
+            $this->messageBus->dispatch(new BanUserMessage(user: $object->creator, reason: $rule->getReason() ?? '', removePosts: $rule->shouldRemoveAll(), removeComments: $rule->shouldRemoveAll()), [
+                new DispatchAfterCurrentBusStamp(),
+            ]);
+            if (!$rule->shouldRemoveAll()) {
+                $this->messageBus->dispatch(new RemovePostMessage(postId: $object->post->id), [
+                    new DispatchAfterCurrentBusStamp(),
+                ]);
+            }
+
+            $context->addMessage("user has been banned because the image in their post contains a QR code matching regex '{$rule->getRegex()}'");
+
+            return FurtherAction::ShouldAbort;
+        }
+
+        return null;
     }
 }
