@@ -14,7 +14,7 @@ final readonly class QrImageDetector
             $qr = (new QRCode())->readFromFile($path);
             return $qr->data;
         } catch (QRCodeDetectorException) {
-            return (new QrReader($path))->text() ?: null;
+            return null;
         }
     }
 }
