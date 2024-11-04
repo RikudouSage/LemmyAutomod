@@ -284,6 +284,10 @@ This works the same as [Ban user if content matches regular expression](#44-ban-
 For example. the following will identify comments or posts with the phrase "you're an idiot" and report them for manual review:  
 `insert into report_regexes (regex, message) values ('you\''re an idiot', 'Possible flame war');`
 
+Note that reports are federated to other instances. If you don't want this, you can choose to only be notified through your [notification channel](#3-notification-setup-optional) by setting `private` to `1`, for example:
+
+`insert into report_regexes (regex, message, private) values ('you\''re an idiot', 'Possible flame war', 1);`
+
 ### **4.6** Trusted users
 
 You can mark users as trusted users by adding them to the trusted_users table. When any user present in this table makes a report, it gets automatically resolved by removing the post or comment.
