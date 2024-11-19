@@ -22,7 +22,7 @@ use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * @implements ModAction<CommentView|PostView|Person|RegistrationApplicationView|EnrichedInstanceData>
+ * @implements ModAction<CommentView|PostView|Person|RegistrationApplicationView|EnrichedInstanceData|LocalUser|CommentReportView|PostReportView>
  */
 #[AsTaggedItem(priority: AutomodPriority::Notification->value)]
 final readonly class NotifyOfActionTaken implements ModAction
@@ -43,6 +43,9 @@ final readonly class NotifyOfActionTaken implements ModAction
                 || $object instanceof PostView
                 || $object instanceof Person
                 || $object instanceof RegistrationApplicationView
+                || $object instanceof CommentReportView
+                || $object instanceof PostReportView
+                || $object instanceof LocalUser
                 || $object instanceof EnrichedInstanceData
             )
             && $this->notificationSender->hasEnabledChannels();
