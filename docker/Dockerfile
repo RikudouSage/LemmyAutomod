@@ -41,6 +41,7 @@ RUN curl https://getcomposer.org/installer -o /tmp/composer-installer && \
     COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload -o -a && \
     rm -rf /usr/local/bin/composer && \
     rm -rf /tmp/composer-installer && \
+    mkdir -p /opt/database && chown 33:33 /opt/database && \
     php bin/console cache:clear && \
     php bin/console cache:warmup && \
     chown -R 33:33 var
