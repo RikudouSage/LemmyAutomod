@@ -48,7 +48,7 @@ RUN curl https://getcomposer.org/installer -o /tmp/composer-installer && \
 
 COPY docker/php.ini /usr/local/etc/php/conf.d/99-custom.ini
 COPY docker/supervisor.conf /etc/supervisor/conf.d/messenger-worker.conf
-RUN mkdir /opt/database && \
+RUN mkdir -p /opt/database && \
     chown 33:33 /opt/* && \
     chmod +x /var/www/html/docker/entrypoint.bash
 
