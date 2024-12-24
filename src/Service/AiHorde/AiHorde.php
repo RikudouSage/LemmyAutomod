@@ -15,6 +15,9 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final readonly class AiHorde
 {
+    /**
+     * @param iterable<MessageFormatter> $formatters
+     */
     public function __construct(
         private HttpClientInterface $httpClient,
         #[TaggedIterator('app.message_formatter')]
