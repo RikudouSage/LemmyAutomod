@@ -34,7 +34,10 @@ final readonly class ExpressionLanguageAiFunctions extends AbstractExpressionLan
         if ($systemPrompt !== null) {
             $history[] = new Message(role: AiActor::System, content: $systemPrompt);
         }
-        $models = array_filter([AiModel::OpenHermesMistral7B], fn (AiModel $model) => count($this->aiHorde->findModels($model)));
+        $models = array_filter(
+            [AiModel::OpenHermesMistral7B, AiModel::Llama318BInstruct],
+            fn (AiModel $model) => count($this->aiHorde->findModels($model)),
+        );
         if (!count($models)) {
             throw new RuntimeException('There are no models online available to service your request.');
         }
