@@ -5,7 +5,10 @@ namespace App\Entity;
 use App\Helper\DisableableEntity;
 use App\Repository\WatchedUserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Rikudou\JsonApiBundle\Attribute\ApiProperty;
+use Rikudou\JsonApiBundle\Attribute\ApiResource;
 
+#[ApiResource]
 #[ORM\Table(name: 'watched_users')]
 #[ORM\Entity(repositoryClass: WatchedUserRepository::class)]
 class WatchedUser implements ResolvableUserEntity
@@ -17,12 +20,15 @@ class WatchedUser implements ResolvableUserEntity
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $username = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $instance = null;
 
+    #[ApiProperty]
     #[ORM\Column(nullable: true)]
     private ?int $userId = null;
 

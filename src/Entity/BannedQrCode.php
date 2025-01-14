@@ -5,7 +5,10 @@ namespace App\Entity;
 use App\Repository\BannedQrCodeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Rikudou\JsonApiBundle\Attribute\ApiProperty;
+use Rikudou\JsonApiBundle\Attribute\ApiResource;
 
+#[ApiResource]
 #[ORM\Entity(repositoryClass: BannedQrCodeRepository::class)]
 #[ORM\Table(name: 'banned_qr_codes')]
 class BannedQrCode
@@ -15,12 +18,15 @@ class BannedQrCode
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ApiProperty]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $regex = null;
 
+    #[ApiProperty(getter: 'shouldRemoveAll')]
     #[ORM\Column]
     private ?bool $removeAll = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $reason = null;
 

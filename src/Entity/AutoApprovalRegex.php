@@ -6,7 +6,10 @@ use App\Helper\DisableableEntity;
 use App\Repository\AutoApprovalRegexRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Rikudou\JsonApiBundle\Attribute\ApiProperty;
+use Rikudou\JsonApiBundle\Attribute\ApiResource;
 
+#[ApiResource(plural: 'auto-approval-regexes')]
 #[ORM\Entity(repositoryClass: AutoApprovalRegexRepository::class)]
 #[ORM\Table(name: 'auto_approval_regexes')]
 class AutoApprovalRegex
@@ -18,6 +21,7 @@ class AutoApprovalRegex
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ApiProperty]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $regex = null;
 

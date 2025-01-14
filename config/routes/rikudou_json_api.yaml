@@ -1,0 +1,2 @@
+rikudou_json_api:
+    resource: '@RikudouJsonApiBundle/Resources/routes.yaml'

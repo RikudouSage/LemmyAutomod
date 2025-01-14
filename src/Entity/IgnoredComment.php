@@ -4,7 +4,10 @@ namespace App\Entity;
 
 use App\Repository\IgnoredCommentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Rikudou\JsonApiBundle\Attribute\ApiProperty;
+use Rikudou\JsonApiBundle\Attribute\ApiResource;
 
+#[ApiResource]
 #[ORM\Table(name: 'ignored_comments')]
 #[ORM\Entity(repositoryClass: IgnoredCommentRepository::class)]
 class IgnoredComment
@@ -14,6 +17,7 @@ class IgnoredComment
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ApiProperty]
     #[ORM\Column(unique: true)]
     private ?int $commentId = null;
 

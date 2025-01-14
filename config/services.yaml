@@ -32,6 +32,8 @@ parameters:
     app.image_check.regex: '%env(IMAGE_CHECK_REGEX)%'
     app.image_check.max_size: '%env(int:IMAGE_MAX_SIZE)%'
 
+    app.management_api.enabled: '%env(bool:MANAGEMENT_API_ENABLED)%'
+
 services:
     # default configuration for services in *this* file
     _defaults:
