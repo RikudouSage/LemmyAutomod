@@ -1,0 +1,18 @@
+# Default configuration for "RikudouJsonApiBundle"
+rikudou_json_api:
+
+    # The route prefix used with default routing file
+    api_prefix:           /api
+
+    # The paths to scan for auto discovered endpoints
+    auto_discover_paths:
+        - '%kernel.project_dir%/src/Entity'
+
+    # The service that will be used to transform class names into resource names and property names into attribute names
+    name_resolution_service: rikudou_api.name_resolution.camel_case
+
+    # Set to true to enable pagination of resources
+    pagination:           true
+
+    # The limit of items per page used if no other limit was specified
+    per_page_limit:       30

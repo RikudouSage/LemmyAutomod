@@ -5,24 +5,31 @@ namespace App\Entity;
 use App\Helper\DisableableEntity;
 use App\Repository\IgnoredUserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Rikudou\JsonApiBundle\Attribute\ApiProperty;
+use Rikudou\JsonApiBundle\Attribute\ApiResource;
 
+#[ApiResource]
 #[ORM\UniqueConstraint(fields: ['username', 'instance'])]
 #[ORM\Table(name: 'ignored_users')]
 #[ORM\Entity(repositoryClass: IgnoredUserRepository::class)]
 class IgnoredUser implements ResolvableUserEntity
 {
     use DisableableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $username = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $instance = null;
 
+    #[ApiProperty]
     #[ORM\Column(unique: true, nullable: true)]
     private ?int $userId = null;
 

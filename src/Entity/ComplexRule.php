@@ -7,7 +7,10 @@ use App\Enum\RunConfiguration;
 use App\Repository\ComplexRuleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Rikudou\JsonApiBundle\Attribute\ApiProperty;
+use Rikudou\JsonApiBundle\Attribute\ApiResource;
 
+#[ApiResource]
 #[ORM\Table(name: 'complex_rules')]
 #[ORM\Entity(repositoryClass: ComplexRuleRepository::class)]
 class ComplexRule
@@ -17,18 +20,23 @@ class ComplexRule
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180, enumType: ComplexRuleType::class)]
     private ?ComplexRuleType $type = null;
 
+    #[ApiProperty]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $rule = null;
 
+    #[ApiProperty]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $actions = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180, enumType: RunConfiguration::class, options: ['default' => RunConfiguration::WhenNotAborted->value])]
     private RunConfiguration $runConfiguration = RunConfiguration::WhenNotAborted;
 
+    #[ApiProperty]
     #[ORM\Column(options: ['default' => true])]
     private bool $enabled = true;
 

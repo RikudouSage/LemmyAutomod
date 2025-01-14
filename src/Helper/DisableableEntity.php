@@ -3,9 +3,11 @@
 namespace App\Helper;
 
 use Doctrine\ORM\Mapping as ORM;
+use Rikudou\JsonApiBundle\Attribute\ApiProperty;
 
 trait DisableableEntity
 {
+    #[ApiProperty]
     #[ORM\Column(options: ['default' => true])]
     private bool $enabled = true;
 

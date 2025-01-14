@@ -6,41 +6,54 @@ use App\Helper\DisableableEntity;
 use App\Repository\InstanceDefederationRuleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Rikudou\JsonApiBundle\Attribute\ApiProperty;
+use Rikudou\JsonApiBundle\Attribute\ApiResource;
 
+#[ApiResource]
 #[ORM\Table(name: 'instance_defederation_rules')]
 #[ORM\Entity(repositoryClass: InstanceDefederationRuleRepository::class)]
 class InstanceDefederationRule
 {
     use DisableableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $software = null;
 
+    #[ApiProperty]
     #[ORM\Column(nullable: true)]
     private ?bool $allowOpenRegistrations = null;
 
+    #[ApiProperty]
     #[ORM\Column(nullable: true)]
     private ?bool $allowOpenRegistrationsWithCaptcha = null;
 
+    #[ApiProperty]
     #[ORM\Column(nullable: true)]
     private ?bool $allowOpenRegistrationsWithEmailVerification = null;
 
+    #[ApiProperty]
     #[ORM\Column(nullable: true)]
     private ?bool $allowOpenRegistrationsWithApplication = null;
 
+    #[ApiProperty]
     #[ORM\Column(nullable: true)]
     private ?bool $treatMissingDataAs = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $minimumVersion = null;
 
+    #[ApiProperty]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $reason = null;
 
+    #[ApiProperty]
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $evidence = null;
 

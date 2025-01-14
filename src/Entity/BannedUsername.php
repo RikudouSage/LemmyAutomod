@@ -5,23 +5,30 @@ namespace App\Entity;
 use App\Helper\DisableableEntity;
 use App\Repository\BannedUsernameRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Rikudou\JsonApiBundle\Attribute\ApiProperty;
+use Rikudou\JsonApiBundle\Attribute\ApiResource;
 
+#[ApiResource]
 #[ORM\Entity(repositoryClass: BannedUsernameRepository::class)]
 #[ORM\Table(name: 'banned_usernames')]
 class BannedUsername
 {
     use DisableableEntity;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180)]
     private ?string $username = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $reason = null;
 
+    #[ApiProperty(getter: 'shouldRemoveAll')]
     #[ORM\Column(options: ['default' => false])]
     private bool $removeAll = false;
 

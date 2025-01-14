@@ -63,6 +63,11 @@ Other features:
     * [Analyze a specific comment or post](#analyze-a-specific-comment-or-post)
     * [Reanalyze all posts since a point in time](#reanalyze-all-posts-since-a-point-in-time)
     * [Send a test notification](#send-a-test-notification)
+  * [Management API](#management-api)
+    * [Securely accessing the api](#securely-accessing-the-api)
+      * [Access it locally on the server only](#access-it-locally-on-the-server-only)
+      * [Add a reverse proxy with a basic auth](#add-a-reverse-proxy-with-a-basic-auth)
+      * [Port forwarding with SSH tunnel](#port-forwarding-with-ssh-tunnel)
 <!-- TOC -->
 # Prerequisites
 To use LemmyAutomod, you will need:
@@ -217,6 +222,8 @@ You can send a test notification to test your setup by running the following com
 `docker exec -it lemmy_automod_1 bin/console app:test:notification "Test message"`
 
 ## 4. Add rules to database
+
+> Since version 2.13.0 you can use an API to control all the below settings, more on that below
 
 LemmyAutomod will run rules over any new content. To set the rules, you add them into the SQLite database. Detailed information about the tables is listed in [Table Descriptions](#table-descriptions).
 
@@ -493,6 +500,7 @@ Here is a list of environment variables and their descriptions:
 | LEMMY_AUTH_MODE               | Whether to send the Lemmy authentication as part of the header, body, or both. Sending as the header prevents credentials showing in logs, but is only supported by Lemmy 0.19.0 and up. See [Lemmy Authentication Mode](#lemmy-authentication-mode) for the options |
 | REMOVAL_LOG_VALIDITY          | The amount of time to keep logs of removals, which are used to restore posts. Default is 24 hours.                                                                                                                                                                   |
 | FEDISEER_API_KEY              | API key for fediseer.com, used to automatically create a censure on Fediseer when an instance is defederated by the automod. See [**4.8.5** Sync defederations to Fediseer censures](#495-sync-defederations-to-fediseer-censures).                                  |
+| MANAGEMENT_API_ENABLED        | Whether the management api should be enabled or not (more on the api below).                                                                                                                                                                                         |
 
 
 ### Lemmy authentication mode
@@ -585,3 +593,128 @@ For example:
 ### Send a test notification
 
 You can trigger a job to send a test notification for testing your notification setup. See [Test notification](#35-test-notification).
+
+## Management API
+
+In addition to controlling the automod using the database directly, you can enable a management api. It's a standard
+rest api where you can create, read, update or delete all the rules. The api resource names are the same as for the
+tables above, except they use a different naming convention (the tables use snake_case, while api uses kebab-case for 
+resource names and camelCase for property names).
+
+**Note that the api doesn't offer any protection, if you expose it to public, anyone can read and modify your rules.**
+
+To enable the api, you must set the `MANAGEMENT_API_ENABLED` environment variable to `1`, otherwise all the endpoints
+will return the not found status code.
+
+After it's enabled, simply visit `/api` in your browser/Postman/whatever, and you will be presented with a list of
+available resources. The api itself uses the [`JSON:API` v1.0 standard](https://jsonapi.org/format/1.0/) and is fairly
+straightforward.
+
+For example, a request to `/api/banned-usernames` might yield a JSON like this:
+
+```json
+{
+  "meta": {
+    "totalItems": 1,
+    "itemsPerPage": 30,
+    "currentPage": 1
+  },
+  "links": {
+    "self": "/api/banned-usernames",
+    "first": "/api/banned-usernames?page=1",
+    "last": "/api/banned-usernames?page=1",
+    "prev": null,
+    "next": null
+  },
+  "data": [
+    {
+      "id": 1,
+      "type": "banned-username",
+      "attributes": {
+        "username": "some-spammer-username-regex",
+        "reason": "spammer",
+        "removeAll": true,
+        "enabled": true
+      }
+    }
+  ],
+  "included": []
+}
+```
+
+### Securely accessing the api
+
+The api runs on port 80 inside the container, so the first thing to do is to add a port mapping to your docker compose:
+
+```yaml
+automod:
+    image: ghcr.io/rikudousage/lemmy-automod:latest
+    environment:
+      - LEMMY_USER=Automod
+      - LEMMY_INSTANCE=lemmings.world
+      - LEMMY_PASSWORD=mypassword
+      - APP_SECRET=[32 character random hex]
+      - REDIS_HOST=redis
+      - LEMMY_AUTH_MODE=4
+    volumes:
+      - ./volumes/automod:/opt/database
+    ports:
+      - 8000:80
+```
+
+The above binds the container port 80 to a server port 8000. You can change the 8000 to anything you want.
+**Make sure the api is not accessible on the chosen port outside the server.**
+Afterwards, you have a few options on how to access it securely:
+
+#### Access it locally on the server only
+
+The simplest, simply access it only on the server using tools like `curl` (and `jq` to format the output). In that case
+you can tighten the security by only allowing the local server to access the port at all:
+
+```yaml
+    ports:
+      - 127.0.0.1:8000:80
+```
+
+#### Add a reverse proxy with a basic auth
+
+You can configure a webserver to forward all requests to the automod and add a basic auth. If you don't already
+have a webserver installed, caddy might be the easiest:
+
+```Caddyfile
+automod.example.com {
+        @http {
+                protocol http
+        }
+        redir @http https://{host}{uri}
+        
+        basicauth {
+                some-username $2a$14$brtKkpOmKlmbU5qWCyQ1MOhxq9/tRHbPN4WIhMZFVu7YUF3euwx7i
+        }
+        
+        reverse_proxy localhost:8000
+}
+```
+
+This makes it only accessible for user named `some-username` with password `test`. To generate the password, you can
+use the `caddy hash-password` command.
+
+In this case you can also tighten the security by only allowing the local ip address binding:
+
+```yaml
+    ports:
+      - 127.0.0.1:8000:80
+```
+
+#### Port forwarding with SSH tunnel
+
+Connect to your server using SSH the way you usually do, but add this parameter:
+
+`-L 8000:127.0.0.1:8000`
+
+For example:
+
+`ssh -i ~/.ssh/my-server.pem -L 8000:127.0.0.1:8000 user@example.com`
+
+This will bind the server port 8000 on your local machine, allowing you to visit `http://127.0.0.1:8000` in your
+browser/Postman/whatever.
