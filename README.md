@@ -223,7 +223,7 @@ You can send a test notification to test your setup by running the following com
 
 ## 4. Add rules to database
 
-> Since version 2.13.0 you can use an API to control all the below settings, more on that below
+> Since version 2.13.0 you can use an API to control all the below settings, more information in the [Management API](#management-api) section
 
 LemmyAutomod will run rules over any new content. To set the rules, you add them into the SQLite database. Detailed information about the tables is listed in [Table Descriptions](#table-descriptions).
 
