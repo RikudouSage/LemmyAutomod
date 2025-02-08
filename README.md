@@ -49,6 +49,7 @@ Other features:
       * [**4.9.3** Minimum version](#493-minimum-version)
       * [**4.9.4** Default values](#494-default-values)
       * [**4.9.5** Sync defederations to Fediseer censures](#495-sync-defederations-to-fediseer-censures)
+    * [**4.10** Remove communities matching a regex](#410-remove-communities-matching-a-regex)
 * [Information](#information)
   * [Table descriptions](#table-descriptions)
   * [Settings](#settings)
