@@ -400,6 +400,17 @@ To do this, add the following to your environment variables in the docker-compos
 
 `FEDISEER_API_KEY=[API key here]`
 
+### **4.10** Remove communities matching a regex
+
+Communities can be removed when their name, title or description matches a regex. You can optionally choose
+to also ban all mods.
+
+Without banning mods:  
+`INSERT INTO community_remove_regexes (regex, reason) VALUES ('blogspamsite\.com', 'spam promoting community')`
+
+With mod banning:  
+`INSERT INTO community_remove_regexes (regex, reason, ban_moderators) VALUES ('blogspamsite\.com', 'spam promoting community', 1)`
+
 # Information
 
 This section contains descriptions of tables, environment variables, and jobs that can be manually run to do various tasks.
@@ -472,6 +483,10 @@ This section contains descriptions of tables, environment variables, and jobs th
     you can simply provide the `username` and `instance` and the automod will save the `user_id` on
     its own next time it is triggered
 - `removal_logs` - this table holds logs of the removals the bot has actioned, and need not be manually modified.
+- `community_remove_regexes` - holds regexes that communities will be matched to and banned if their title/name/description matches
+  - `regex` - the regex string
+  - `reason` - optional reason for the removal
+  - `ban_moderators` - 0 or 1, whether the community's moderators should be banned, defaults to 0
 
 ## Settings
 
