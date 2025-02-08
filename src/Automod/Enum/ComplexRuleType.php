@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\CommentView;
+use Rikudou\LemmyApi\Response\View\CommunityView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Rikudou\LemmyApi\Response\View\PrivateMessageReportView;
@@ -24,6 +25,7 @@ enum ComplexRuleType: string
     case RegistrationApplication = 'registration_application';
     case LocalUser = 'local_user';
     case Instance = 'instance';
+    case Community = 'community';
 
     public static function fromClass(string $class): self
     {
@@ -37,6 +39,7 @@ enum ComplexRuleType: string
             RegistrationApplicationView::class => self::RegistrationApplication,
             LocalUser::class => self::LocalUser,
             EnrichedInstanceData::class => self::Instance,
+            CommunityView::class => self::Community,
             default => throw new InvalidArgumentException("Unsupported class: {$class}"),
         };
     }
