@@ -9,6 +9,7 @@ use App\Dto\Request\InstanceFederatedRequest;
 use App\Dto\Request\TriggerIdRequest;
 use App\Message\AnalyzeCommentMessage;
 use App\Message\AnalyzeCommentReportMessage;
+use App\Message\AnalyzeCommunityMessage;
 use App\Message\AnalyzeInstanceMessage;
 use App\Message\AnalyzeLocalUserMessage;
 use App\Message\AnalyzePostMessage;
@@ -103,6 +104,20 @@ final class TriggerController extends AbstractController
         $messageBus->dispatch(new AnalyzeInstanceMessage(
             instance: $request->instance,
         ));
+        return new JsonResponse(status: Response::HTTP_NO_CONTENT);
+    }
+
+    #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: null, objectType: 'community', operation: 'INSERT', enhancedFilter: null)]
+    #[WebhookConfig(bodyExpression: '{id: data.data.id}', filterExpression: null, objectType: 'community', operation: 'UPDATE', enhancedFilter: null, uniqueNameSuffix: 'update')]
+    #[Route('/community', name: 'app.triggers.community', methods: [Request::METHOD_POST])]
+    public function community(
+        #[MapRequestPayload] TriggerIdRequest $request,
+        MessageBusInterface $messageBus,
+    ): JsonResponse {
+        $messageBus->dispatch(new AnalyzeCommunityMessage(
+            communityId: $request->id,
+        ));
+
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
 }

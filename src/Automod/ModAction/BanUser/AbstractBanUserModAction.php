@@ -108,7 +108,7 @@ abstract readonly class AbstractBanUserModAction extends AbstractModAction
 
     /**
      * @param TObject $object
-     * @return array<string>
+     * @return array<string | null>
      */
     abstract protected function getTextsToCheck(object $object): array;
 

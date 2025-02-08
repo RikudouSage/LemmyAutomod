@@ -15,6 +15,7 @@ use Rikudou\LemmyApi\LemmyApi;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\CommentView;
+use Rikudou\LemmyApi\Response\View\CommunityView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Rikudou\LemmyApi\Response\View\RegistrationApplicationView;
@@ -47,6 +48,7 @@ final readonly class NotifyOfActionTaken implements ModAction
                 || $object instanceof PostReportView
                 || $object instanceof LocalUser
                 || $object instanceof EnrichedInstanceData
+                || $object instanceof CommunityView
             )
             && $this->notificationSender->hasEnabledChannels();
     }
@@ -91,6 +93,10 @@ final readonly class NotifyOfActionTaken implements ModAction
             $target = 'their federation attempt';
             $username = $object->instance;
             $url = "https://{$object->instance}";
+        } else if ($object instanceof CommunityView) {
+            $username = $object->community->name;
+            $url = $object->community->actorId;
+            $target = 'their content';
         }
 
         if ($target === null || $username === null) {

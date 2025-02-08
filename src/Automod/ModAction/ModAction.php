@@ -10,6 +10,7 @@ use App\Enum\RunConfiguration;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\CommentView;
+use Rikudou\LemmyApi\Response\View\CommunityView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Rikudou\LemmyApi\Response\View\PrivateMessageReportView;
@@ -17,7 +18,7 @@ use Rikudou\LemmyApi\Response\View\RegistrationApplicationView;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * @template TObject of (PostView|CommentView|Person|CommentReportView|PostReportView|PrivateMessageReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData)
+ * @template TObject of (PostView|CommentView|Person|CommentReportView|PostReportView|PrivateMessageReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData|CommunityView)
  */
 #[AutoconfigureTag(name: 'app.mod_action')]
 interface ModAction
