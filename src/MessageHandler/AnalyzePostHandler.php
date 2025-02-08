@@ -30,6 +30,6 @@ final readonly class AnalyzePostHandler
             return;
         }
         $this->automod->analyze($post);
-        $this->automod->analyze($this->api->community()->get($post->community->id));
+        $this->automod->analyze($post->community);
     }
 }

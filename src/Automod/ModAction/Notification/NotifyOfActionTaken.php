@@ -12,10 +12,10 @@ use App\Enum\RunConfiguration;
 use App\Service\InstanceLinkConverter;
 use App\Service\Notification\NotificationSender;
 use Rikudou\LemmyApi\LemmyApi;
+use Rikudou\LemmyApi\Response\Model\Community;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\CommentView;
-use Rikudou\LemmyApi\Response\View\CommunityView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Rikudou\LemmyApi\Response\View\RegistrationApplicationView;
@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * @implements ModAction<CommentView|PostView|Person|RegistrationApplicationView|EnrichedInstanceData|LocalUser|CommentReportView|PostReportView>
+ * @implements ModAction<CommentView|PostView|Person|RegistrationApplicationView|EnrichedInstanceData|LocalUser|CommentReportView|PostReportView|Community>
  */
 #[AsTaggedItem(priority: AutomodPriority::Notification->value)]
 final readonly class NotifyOfActionTaken implements ModAction
@@ -48,7 +48,7 @@ final readonly class NotifyOfActionTaken implements ModAction
                 || $object instanceof PostReportView
                 || $object instanceof LocalUser
                 || $object instanceof EnrichedInstanceData
-                || $object instanceof CommunityView
+                || $object instanceof Community
             )
             && $this->notificationSender->hasEnabledChannels();
     }
@@ -93,9 +93,9 @@ final readonly class NotifyOfActionTaken implements ModAction
             $target = 'their federation attempt';
             $username = $object->instance;
             $url = "https://{$object->instance}";
-        } else if ($object instanceof CommunityView) {
-            $username = $object->community->name;
-            $url = $object->community->actorId;
+        } else if ($object instanceof Community) {
+            $username = $object->name;
+            $url = $object->actorId;
             $target = 'their content';
         }
 

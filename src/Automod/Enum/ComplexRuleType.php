@@ -5,10 +5,10 @@ namespace App\Automod\Enum;
 use App\Dto\Model\EnrichedInstanceData;
 use App\Dto\Model\LocalUser;
 use InvalidArgumentException;
+use Rikudou\LemmyApi\Response\Model\Community;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\CommentView;
-use Rikudou\LemmyApi\Response\View\CommunityView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Rikudou\LemmyApi\Response\View\PrivateMessageReportView;
@@ -39,7 +39,7 @@ enum ComplexRuleType: string
             RegistrationApplicationView::class => self::RegistrationApplication,
             LocalUser::class => self::LocalUser,
             EnrichedInstanceData::class => self::Instance,
-            CommunityView::class => self::Community,
+            Community::class => self::Community,
             default => throw new InvalidArgumentException("Unsupported class: {$class}"),
         };
     }

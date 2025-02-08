@@ -7,10 +7,10 @@ use App\Dto\Model\LocalUser;
 use App\Enum\RunConfiguration;
 use App\Service\Transliterator;
 use Rikudou\LemmyApi\LemmyApi;
+use Rikudou\LemmyApi\Response\Model\Community;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\CommentView;
-use Rikudou\LemmyApi\Response\View\CommunityView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Rikudou\LemmyApi\Response\View\PrivateMessageReportView;
@@ -18,7 +18,7 @@ use Rikudou\LemmyApi\Response\View\RegistrationApplicationView;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
- * @template TObject of (PostView|CommentView|Person|CommentReportView|PostReportView|PrivateMessageReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData|CommunityView)
+ * @template TObject of (PostView|CommentView|Person|CommentReportView|PostReportView|PrivateMessageReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData|Community)
  * @implements ModAction<TObject>
  */
 abstract readonly class AbstractModAction implements ModAction

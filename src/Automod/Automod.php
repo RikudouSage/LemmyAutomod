@@ -8,10 +8,10 @@ use App\Dto\Model\EnrichedInstanceData;
 use App\Dto\Model\LocalUser;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
+use Rikudou\LemmyApi\Response\Model\Community;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\CommentView;
-use Rikudou\LemmyApi\Response\View\CommunityView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Rikudou\LemmyApi\Response\View\RegistrationApplicationView;
@@ -29,7 +29,7 @@ final readonly class Automod
     }
 
     public function analyze(
-        PostView|CommentView|Person|CommentReportView|PostReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData|CommunityView $object
+        PostView|CommentView|Person|CommentReportView|PostReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData|Community $object
     ): void {
         $furtherAction = FurtherAction::CanContinue;
         $context = new Context();

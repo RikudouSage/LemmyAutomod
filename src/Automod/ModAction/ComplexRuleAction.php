@@ -11,21 +11,19 @@ use App\Enum\RunConfiguration;
 use App\Repository\ComplexRuleRepository;
 use App\Service\Expression\ExpressionLanguage;
 use App\Service\Expression\ExpressionLanguageNotifier;
-use LogicException;
 use Rikudou\LemmyApi\LemmyApi;
+use Rikudou\LemmyApi\Response\Model\Community;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
 use Rikudou\LemmyApi\Response\View\CommentView;
-use Rikudou\LemmyApi\Response\View\CommunityView;
 use Rikudou\LemmyApi\Response\View\PostReportView;
 use Rikudou\LemmyApi\Response\View\PostView;
 use Rikudou\LemmyApi\Response\View\PrivateMessageReportView;
 use Rikudou\LemmyApi\Response\View\RegistrationApplicationView;
-use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 use Symfony\Component\ExpressionLanguage\SyntaxError;
 
 /**
- * @implements ModAction<PostView|CommentView|Person|CommentReportView|PostReportView|PrivateMessageReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData|CommunityView>
+ * @implements ModAction<PostView|CommentView|Person|CommentReportView|PostReportView|PrivateMessageReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData|Community>
  */
 final readonly class ComplexRuleAction implements ModAction
 {

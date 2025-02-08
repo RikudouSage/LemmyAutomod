@@ -9,11 +9,11 @@ use App\Enum\FurtherAction;
 use App\Helper\TextsHelper;
 use App\Message\RemoveCommunityMessage;
 use App\Repository\CommunityRemoveRegexRepository;
-use Rikudou\LemmyApi\Response\View\CommunityView;
+use Rikudou\LemmyApi\Response\Model\Community;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
- * @extends AbstractModAction<CommunityView>
+ * @extends AbstractModAction<Community>
  */
 final readonly class RemoveCommunityAction extends AbstractModAction
 {
@@ -25,7 +25,7 @@ final readonly class RemoveCommunityAction extends AbstractModAction
 
     public function shouldRun(object $object): bool
     {
-        if (!$object instanceof CommunityView) {
+        if (!$object instanceof Community) {
             return false;
         }
 
@@ -87,11 +87,11 @@ final readonly class RemoveCommunityAction extends AbstractModAction
         return null;
     }
 
-    private function removeCommunity(CommunityView $object, CommunityRemoveRegex $rule, Context $context): FurtherAction
+    private function removeCommunity(Community $object, CommunityRemoveRegex $rule, Context $context): FurtherAction
     {
         $context->addMessage("removed community for matching regex `{$rule->getRegex()}`");
         $this->messageBus->dispatch(new RemoveCommunityMessage(
-            community: $object->community,
+            community: $object,
             reason: $rule->getReason(),
             banMods: $rule->shouldBanModerators(),
         ));

@@ -2,8 +2,8 @@
 
 namespace App\Helper;
 
+use Rikudou\LemmyApi\Response\Model\Community;
 use Rikudou\LemmyApi\Response\View\CommentView;
-use Rikudou\LemmyApi\Response\View\CommunityView;
 use Rikudou\LemmyApi\Response\View\PostView;
 
 final readonly class TextsHelper
@@ -27,8 +27,8 @@ final readonly class TextsHelper
     /**
      * @return array<string | null>
      */
-    public static function getCommunityTextsToCheck(CommunityView $community): array
+    public static function getCommunityTextsToCheck(Community $community): array
     {
-        return [$community->community->name, $community->community->title, $community->community->description];
+        return [$community->name, $community->title, $community->description];
     }
 }
