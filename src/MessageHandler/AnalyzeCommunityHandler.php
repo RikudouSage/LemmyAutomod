@@ -19,6 +19,6 @@ final readonly class AnalyzeCommunityHandler
     public function __invoke(AnalyzeCommunityMessage $message): void
     {
         $community = $this->api->community()->get($message->communityId);
-        $this->automod->analyze($community);
+        $this->automod->analyze($community->community);
     }
 }
