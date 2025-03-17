@@ -50,6 +50,7 @@ Other features:
       * [**4.9.4** Default values](#494-default-values)
       * [**4.9.5** Sync defederations to Fediseer censures](#495-sync-defederations-to-fediseer-censures)
     * [**4.10** Remove communities matching a regex](#410-remove-communities-matching-a-regex)
+    * [**4.11** Ban user for a private message content](#411-ban-user-for-a-private-message-content)
 * [Information](#information)
   * [Table descriptions](#table-descriptions)
   * [Settings](#settings)
