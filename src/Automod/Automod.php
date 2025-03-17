@@ -6,6 +6,7 @@ use App\Automod\ModAction\ModAction;
 use App\Context\Context;
 use App\Dto\Model\EnrichedInstanceData;
 use App\Dto\Model\LocalUser;
+use App\Dto\Model\PrivateMessage;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
 use Rikudou\LemmyApi\Response\Model\Community;
@@ -29,7 +30,17 @@ final readonly class Automod
     }
 
     public function analyze(
-        PostView|CommentView|Person|CommentReportView|PostReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData|Community $object
+        PostView
+        |CommentView
+        |Person
+        |CommentReportView
+        |PostReportView
+        |RegistrationApplicationView
+        |LocalUser
+        |EnrichedInstanceData
+        |Community
+        |PrivateMessage
+            $object
     ): void {
         $furtherAction = FurtherAction::CanContinue;
         $context = new Context();
