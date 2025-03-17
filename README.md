@@ -50,6 +50,7 @@ Other features:
       * [**4.9.4** Default values](#494-default-values)
       * [**4.9.5** Sync defederations to Fediseer censures](#495-sync-defederations-to-fediseer-censures)
     * [**4.10** Remove communities matching a regex](#410-remove-communities-matching-a-regex)
+    * [**4.11** Ban user for a private message content](#411-ban-user-for-a-private-message-content)
 * [Information](#information)
   * [Table descriptions](#table-descriptions)
   * [Settings](#settings)
@@ -412,6 +413,20 @@ Without banning mods:
 With mod banning:  
 `INSERT INTO community_remove_regexes (regex, reason, ban_moderators) VALUES ('blogspamsite\.com', 'spam promoting community', 1)`
 
+### **4.11** Ban user for a private message content
+
+The senders of a private message can be banned if their private message matches a regex. Sadly Lemmy doesn't allow
+deleting a message using api, so there's no way to delete it.
+
+Without deleting all the user's content:
+
+`INSERT INTO private_message_ban_regexes (regex, reason) VALUES ('blogspamsite\.com', 'spammer')`
+
+With deleting all the user's content:
+
+`INSERT INTO private_message_ban_regexes (regex, reason, remove_all) VALUES ('blogspamsite\.com', 'spammer', 1)`
+
+
 # Information
 
 This section contains descriptions of tables, environment variables, and jobs that can be manually run to do various tasks.
@@ -488,6 +503,11 @@ This section contains descriptions of tables, environment variables, and jobs th
   - `regex` - the regex string
   - `reason` - optional reason for the removal
   - `ban_moderators` - 0 or 1, whether the community's moderators should be banned, defaults to 0
+- `private_message_ban_regexes` - holds regexes that private message will be matched to and banned if they match
+  - `regex` - the regex string
+  - `reason` - optional reason for the removal
+  - `remove_all` - whether to remove all user's posts and comments
+  - `enabled` - whether the rule is enabled. If set to `false`, the rule will be ignored.
 
 ## Settings
 

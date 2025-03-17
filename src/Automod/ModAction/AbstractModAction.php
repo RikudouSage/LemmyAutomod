@@ -4,6 +4,7 @@ namespace App\Automod\ModAction;
 
 use App\Dto\Model\EnrichedInstanceData;
 use App\Dto\Model\LocalUser;
+use App\Dto\Model\PrivateMessage;
 use App\Enum\RunConfiguration;
 use App\Service\Transliterator;
 use Rikudou\LemmyApi\LemmyApi;
@@ -18,7 +19,7 @@ use Rikudou\LemmyApi\Response\View\RegistrationApplicationView;
 use Symfony\Contracts\Service\Attribute\Required;
 
 /**
- * @template TObject of (PostView|CommentView|Person|CommentReportView|PostReportView|PrivateMessageReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData|Community)
+ * @template TObject of (PostView|CommentView|Person|CommentReportView|PostReportView|PrivateMessageReportView|RegistrationApplicationView|LocalUser|EnrichedInstanceData|Community|PrivateMessage)
  * @implements ModAction<TObject>
  */
 abstract readonly class AbstractModAction implements ModAction

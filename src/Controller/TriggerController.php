@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Attribute\WebhookConfig;
 use App\Dto\Model\BasicInstanceData;
 use App\Dto\Model\LocalUser;
+use App\Dto\Model\PrivateMessage;
 use App\Dto\Request\InstanceFederatedRequest;
 use App\Dto\Request\TriggerIdRequest;
 use App\Message\AnalyzeCommentMessage;
@@ -14,6 +15,7 @@ use App\Message\AnalyzeInstanceMessage;
 use App\Message\AnalyzeLocalUserMessage;
 use App\Message\AnalyzePostMessage;
 use App\Message\AnalyzePostReportMessage;
+use App\Message\AnalyzePrivateMessageMessage;
 use App\Message\AnalyzeRegistrationApplicationMessage;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -117,6 +119,17 @@ final class TriggerController extends AbstractController
         $messageBus->dispatch(new AnalyzeCommunityMessage(
             communityId: $request->id,
         ));
+
+        return new JsonResponse(status: Response::HTTP_NO_CONTENT);
+    }
+
+    #[WebhookConfig(bodyExpression: 'private_message_with_content(data.data.id)', filterExpression: null, objectType: 'private_message', operation: 'INSERT', enhancedFilter: null)]
+    #[Route('/private-message', name: 'app.triggers.private_message', methods: [Request::METHOD_POST])]
+    public function privateMessage(
+        #[MapRequestPayload] PrivateMessage $request,
+        MessageBusInterface $messageBus,
+    ): JsonResponse {
+        $messageBus->dispatch(new AnalyzePrivateMessageMessage($request));
 
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }

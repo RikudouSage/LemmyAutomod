@@ -7,6 +7,7 @@ use App\Automod\ModAction\ModAction;
 use App\Context\Context;
 use App\Dto\Model\EnrichedInstanceData;
 use App\Dto\Model\LocalUser;
+use App\Dto\Model\PrivateMessage;
 use App\Enum\FurtherAction;
 use App\Enum\RunConfiguration;
 use App\Service\InstanceLinkConverter;
@@ -23,7 +24,7 @@ use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * @implements ModAction<CommentView|PostView|Person|RegistrationApplicationView|EnrichedInstanceData|LocalUser|CommentReportView|PostReportView|Community>
+ * @implements ModAction<CommentView|PostView|Person|RegistrationApplicationView|EnrichedInstanceData|LocalUser|CommentReportView|PostReportView|Community|PrivateMessage>
  */
 #[AsTaggedItem(priority: AutomodPriority::Notification->value)]
 final readonly class NotifyOfActionTaken implements ModAction
@@ -49,6 +50,7 @@ final readonly class NotifyOfActionTaken implements ModAction
                 || $object instanceof LocalUser
                 || $object instanceof EnrichedInstanceData
                 || $object instanceof Community
+                || $object instanceof PrivateMessage
             )
             && $this->notificationSender->hasEnabledChannels();
     }
@@ -97,6 +99,10 @@ final readonly class NotifyOfActionTaken implements ModAction
             $username = $object->name;
             $url = $object->actorId;
             $target = 'their content';
+        } else if ($object instanceof PrivateMessage) {
+            $person = $this->api->user()->get($object->creatorId);
+            $username = "{$person->name}@" . parse_url($person->actorId, PHP_URL_HOST);
+            $target = "the content of a private message with id {$object->id}";
         }
 
         if ($target === null || $username === null) {
