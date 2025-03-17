@@ -4,6 +4,7 @@ namespace App\Automod\Enum;
 
 use App\Dto\Model\EnrichedInstanceData;
 use App\Dto\Model\LocalUser;
+use App\Dto\Model\PrivateMessage;
 use InvalidArgumentException;
 use Rikudou\LemmyApi\Response\Model\Community;
 use Rikudou\LemmyApi\Response\Model\Person;
@@ -26,6 +27,7 @@ enum ComplexRuleType: string
     case LocalUser = 'local_user';
     case Instance = 'instance';
     case Community = 'community';
+    case PrivateMessageWithContent = 'private_message_with_content';
 
     public static function fromClass(string $class): self
     {
@@ -40,6 +42,7 @@ enum ComplexRuleType: string
             LocalUser::class => self::LocalUser,
             EnrichedInstanceData::class => self::Instance,
             Community::class => self::Community,
+            PrivateMessage::class => self::PrivateMessageWithContent,
             default => throw new InvalidArgumentException("Unsupported class: {$class}"),
         };
     }
