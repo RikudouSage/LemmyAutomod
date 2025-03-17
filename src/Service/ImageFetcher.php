@@ -36,27 +36,28 @@ final readonly class ImageFetcher
             return $cacheItem->get();
         }
 
-        $response = $this->httpClient->request(Request::METHOD_GET, $url);
-        if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300 || strlen($response->getContent()) > $this->maxSize) {
-            $cacheItem->set(null);
-        } else {
-            $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
-            $isImage = str_starts_with($contentType, 'image/');
-            if (!$isImage) {
-                $filepath = tempnam(sys_get_temp_dir(), 'lemmy_automod');
-                file_put_contents($filepath, $response->getContent());
-                $isImage = str_starts_with($this->typeGuesser->guessMimeType($filepath), 'image/');
-            }
-            if ($isImage) {
-                $filepath = tempnam(sys_get_temp_dir(), 'lemmy_automod');
-                file_put_contents($filepath, $response->getContent());
-
-                $text = $this->qrImageDetector->getQrCodeContent($filepath);
-
-                if ($text === null) {
-                    file_put_contents($filepath, $this->imageManipulator->invertColors($response->getContent()));
-                    $text = $this->qrImageDetector->getQrCodeContent($filepath);
+        try {
+            $response = $this->httpClient->request(Request::METHOD_GET, $url);
+            if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300 || strlen($response->getContent()) > $this->maxSize) {
+                $cacheItem->set(null);
+            } else {
+                $contentType = $response->getHeaders(false)['content-type'][0] ?? '';
+                $isImage = str_starts_with($contentType, 'image/');
+                if (!$isImage) {
+                    $filepath = tempnam(sys_get_temp_dir(), 'lemmy_automod');
+                    file_put_contents($filepath, $response->getContent());
+                    $isImage = str_starts_with($this->typeGuesser->guessMimeType($filepath), 'image/');
                 }
+                if ($isImage) {
+                    $filepath = tempnam(sys_get_temp_dir(), 'lemmy_automod');
+                    file_put_contents($filepath, $response->getContent());
+
+                    $text = $this->qrImageDetector->getQrCodeContent($filepath);
+
+                    if ($text === null) {
+                        file_put_contents($filepath, $this->imageManipulator->invertColors($response->getContent()));
+                        $text = $this->qrImageDetector->getQrCodeContent($filepath);
+                    }
 
 //                if ($text === null) {
 //                    file_put_contents($filepath, $this->imageManipulator->blackAndWhite($response->getContent()));
@@ -68,7 +69,12 @@ final readonly class ImageFetcher
 //                    $text = $this->qrImageDetector->getQrCodeContent($filepath);
 //                }
 
-                $cacheItem->set($text);
+                    $cacheItem->set($text);
+                }
+            }
+        } finally {
+            if (isset($filepath) && is_file($filepath)) {
+                unlink($filepath);
             }
         }
 
