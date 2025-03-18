@@ -35,6 +35,6 @@ final readonly class LlamaPromptFormatter implements MessageFormatter
 
     public function supports(AiModel $model): bool
     {
-        return $model === AiModel::Llama318BInstruct;
+        return $model === AiModel::Llama318BInstruct || $model === AiModel::Llama38BInstruct;
     }
 }

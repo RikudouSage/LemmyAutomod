@@ -35,7 +35,7 @@ final readonly class ExpressionLanguageAiFunctions extends AbstractExpressionLan
             $history[] = new Message(role: AiActor::System, content: $systemPrompt);
         }
         $models = array_filter(
-            [AiModel::OpenHermesMistral7B, AiModel::Llama318BInstruct],
+            [AiModel::OpenHermesMistral7B, AiModel::Llama318BInstruct, AiModel::Llama38BInstruct],
             fn (AiModel $model) => count($this->aiHorde->findModels($model)),
         );
         if (!count($models)) {

@@ -68,6 +68,10 @@ final readonly class ComplexRuleAction implements ModAction
             if (!$canContinue && $rule->getRunConfiguration() !== RunConfiguration::Always) {
                 continue;
             }
+            $ruleExpression = $rule->getRule();
+            if (!$this->expressionLanguage->evaluate($ruleExpression, ['object' => $object])) {
+                continue;
+            }
             $expression = $rule->getActions();
             try {
                 $result = (bool) $this->expressionLanguage->evaluate($expression, [

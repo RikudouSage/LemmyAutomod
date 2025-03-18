@@ -8,4 +8,5 @@ enum AiModel: string
     case Fimbulvetr11Bv2 = 'Fimbulvetr-11B-v2';
     case LLaMA213BEstopia = 'LLaMA2-13B-Estopia';
     case Llama318BInstruct = 'Meta-Llama-3.1-8B-Instruct';
+    case Llama38BInstruct = 'Meta-Llama-3-8B-Instruct';
 }
