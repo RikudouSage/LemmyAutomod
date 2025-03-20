@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Yaml\Yaml;
@@ -27,6 +28,8 @@ final class DumpWebhookConfigCommand extends Command
     public function __construct(
         #[TaggedIterator('controller.service_arguments')]
         private readonly iterable $controllers,
+        #[Autowire('%app.signature.key%')]
+        private readonly string $signatureKey,
     ) {
         parent::__construct();
     }
@@ -96,6 +99,10 @@ final class DumpWebhookConfigCommand extends Command
                     }
                     if ($webhookConfig->enhancedFilter) {
                         $config['enhancedFilterExpression'] = $webhookConfig->enhancedFilter;
+                    }
+                    if ($this->signatureKey) {
+                        $config['signingMode'] = 'symmetric';
+                        $config['signingKey'] = $this->signatureKey;
                     }
                     $result['webhooks'][] = $config;
                 }

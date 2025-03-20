@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 #[AsEventListener(event: KernelEvents::REQUEST, method: 'onRequest')]
-final readonly class PreRequestListener
+final readonly class ManagementApiShortCircuitListener
 {
     public function __construct(
         #[Autowire('%app.management_api.enabled%')]
