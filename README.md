@@ -23,6 +23,7 @@ Other features:
     * [**2.1** Update docker compose stack](#21-update-docker-compose-stack)
     * [**2.2** Export YAML](#22-export-yaml)
     * [**2.3** Import webhooks](#23-import-webhooks)
+    * [**2.4** Signed webhooks](#24-signed-webhooks)
   * [3. Notification setup (optional)](#3-notification-setup-optional)
     * [**3.1**  Private message on Lemmy](#31-private-message-on-lemmy)
     * [**3.2** Post to chat room on Matrix](#32-post-to-chat-room-on-matrix)
