@@ -124,6 +124,31 @@ Click "Import", and the required webhooks should be automatically added.
 
 LemmyWebhook is now set up to trigger LemmyAutomod.
 
+### **2.4** Signed webhooks
+
+> This features requires at LemmyWebhook 0.21.1 and LemmyWebhookManager 1.3.1
+
+If you want to be sure that only the webhooks you've configured are triggering the automod, you can configure request
+signing by providing the `EXPECTED_SIGNATURE_KEY` environment variable. Automod will reject all trigger requests
+that don't contain a valid signature.
+
+To generate a secure signing key, you can use the `app:generate:signing-key` command:
+
+`docker exec [lemmy_automod_1] bin/console app:generate:signing-key`
+
+The output should look similar to this:
+
+`whsec_YAd8/7s4GJropwAqo9uK+ZY0wExKlmi2L+mTOvFDxlqOZQdXd6LqBF7VIviCEyAZwQzzXSvL7HLSqpJ6NDSPsA==`
+
+Note that you need to configure webhooks to sign the content using the key. The easiest way is to run the `app:dump`
+command from section [2.2](#22-export-yaml) while having configured a signing key, the export will contain the necessary
+configuration which you can then import.
+
+> If you want to migrate an existing setup without keys to a setup with a signing key without any downtime, you can
+> first generate the key and then run the `app:dump` command with manually provided `EXPECTED_SIGNATURE_KEY` env
+> variable. That way, the export will contain the signing key, but automod will still work without it. After you import
+> the new config to Lemmy Webhook, you can come back and set the signing key for the whole automod.
+
 ## 3. Notification setup (optional)
 
 There are three options for receiving notifications: A private message on Lemmy, or posting to a chat room on Matrix or Slack.
