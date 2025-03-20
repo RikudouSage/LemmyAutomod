@@ -33,6 +33,7 @@ parameters:
     app.image_check.max_size: '%env(int:IMAGE_MAX_SIZE)%'
 
     app.management_api.enabled: '%env(bool:MANAGEMENT_API_ENABLED)%'
+    app.signature.key: '%env(EXPECTED_SIGNATURE_KEY)%'
 
 services:
     # default configuration for services in *this* file
