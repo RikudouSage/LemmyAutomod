@@ -15,18 +15,23 @@ final readonly class RequestSignatureValidator
     private const string SYMMETRIC_PREFIX = 'whsec_';
 
     public function __construct(
-        #[Autowire('%app.signature.key')]
+        #[Autowire('%app.signature.key%')]
         private string $signingKey,
+        #[Autowire('%rikudou_api.api_prefix%')]
+        private string $apiPrefix,
     ) {
     }
 
     public function onRequest(RequestEvent $event): void
     {
+        $request = $event->getRequest();
+
+        if (str_starts_with($request->getpathInfo(), $this->apiPrefix)) {
+            return;
+        }
         if (!$this->signingKey) {
             return;
         }
-
-        $request = $event->getRequest();
 
         $signature = $request->headers->get('webhook-signature');
         $timestamp = $request->headers->get('webhook-timestamp');
