@@ -9,6 +9,7 @@ use App\Entity\PrivateMessageBanRegex;
 use App\Enum\FurtherAction;
 use App\Message\BanUserMessage;
 use App\Repository\PrivateMessageBanRegexRepository;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 /**
@@ -17,7 +18,9 @@ use Symfony\Component\Messenger\MessageBusInterface;
 final readonly class BanForPrivateMessageContentAction extends AbstractModAction
 {
     public function __construct(
-        private PrivateMessageBanRegexRepository $repository, private MessageBusInterface $messageBus,
+        private PrivateMessageBanRegexRepository $repository,
+        private MessageBusInterface $messageBus,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -27,14 +30,18 @@ final readonly class BanForPrivateMessageContentAction extends AbstractModAction
             return false;
         }
 
+        $this->logger->debug("Received a private message with id '{$object->id}'");
         if ($this->findMatchingRegexRule($object->content)) {
+            $this->logger->debug('The private message matches a rule');
             return true;
         }
 
         if ($this->findMatchingRegexRule($this->transliterator->transliterate($object->content))) {
+            $this->logger->debug('The private message matches a rule (transliterated)');
             return true;
         }
 
+        $this->logger->debug('The private message does not match any rules');
         return false;
     }
 
@@ -43,6 +50,8 @@ final readonly class BanForPrivateMessageContentAction extends AbstractModAction
         $rule = $this->findMatchingRegexRule($object->content)
             ?? $this->findMatchingRegexRule($this->transliterator->transliterate($object->content))
         ;
+
+        $this->logger->debug("The matched rule has id '{$rule->getId()}' and regex '{$rule->getRegex()}'");
 
         $sender = $this->api->user()->get($object->creatorId);
         $this->messageBus->dispatch(new BanUserMessage(
