@@ -34,6 +34,7 @@ parameters:
 
     app.management_api.enabled: '%env(bool:MANAGEMENT_API_ENABLED)%'
     app.signature.key: '%env(EXPECTED_SIGNATURE_KEY)%'
+    app.log_level: '%env(LOG_LEVEL)%'
 
 services:
     # default configuration for services in *this* file
