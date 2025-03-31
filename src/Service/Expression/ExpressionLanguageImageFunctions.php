@@ -19,7 +19,7 @@ final readonly class ExpressionLanguageImageFunctions extends AbstractExpression
     {
         return [
             new ExpressionFunction(
-                'max_image_similarity',
+                'image_similarity',
                 $this->uncompilableFunction(),
                 $this->imageSimilarity(...),
             ),
