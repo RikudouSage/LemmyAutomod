@@ -11,7 +11,6 @@ use App\Enum\RunConfiguration;
 use App\Repository\ComplexRuleRepository;
 use App\Service\Expression\ExpressionLanguage;
 use App\Service\Expression\ExpressionLanguageNotifier;
-use Rikudou\LemmyApi\LemmyApi;
 use Rikudou\LemmyApi\Response\Model\Community;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
@@ -30,7 +29,6 @@ final readonly class ComplexRuleAction implements ModAction
     public function __construct(
         private ComplexRuleRepository $ruleRepository,
         private ExpressionLanguage $expressionLanguage,
-        private LemmyApi $api,
         private ExpressionLanguageNotifier $notifier,
     ) {
     }
@@ -76,7 +74,6 @@ final readonly class ComplexRuleAction implements ModAction
             try {
                 $result = (bool) $this->expressionLanguage->evaluate($expression, [
                     'object' => $object,
-                    'lemmy' => $this->api,
                 ]);
             } catch (SyntaxError $e) {
                 $context->addMessage("There's a syntax error in complex rule with id '{$rule->getId()}': {$e->getMessage()}");

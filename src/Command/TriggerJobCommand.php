@@ -103,6 +103,8 @@ final class TriggerJobCommand extends Command
                     $value = $this->api->user()->get($value);
                 } else if ($type === 'bool') {
                     $value = $value === 'true';
+                } else if (class_exists($type) && is_string($value) && is_array(json_decode($value, true))) {
+                    $value = $this->createInstance($type, json_decode($value, true));
                 }
 
                 $namedParameters ? ($args[$argument->getName()] = $value) : ($args[$i] = $value);
