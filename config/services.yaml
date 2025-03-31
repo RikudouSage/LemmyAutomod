@@ -100,4 +100,7 @@ services:
             - registerProvider: ['@App\Service\Expression\ExpressionLanguageAiFunctions']
             - registerProvider: ['@App\Service\Expression\ExpressionLanguageStringFunctions']
             - registerProvider: ['@App\Service\Expression\ExpressionLanguageLemmyFunctions']
+            - registerProvider: ['@App\Service\Expression\ExpressionLanguageMarkdownFunctions']
+            - registerProvider: ['@App\Service\Expression\ExpressionLanguageArrayFunctions']
+            - registerProvider: ['@App\Service\Expression\ExpressionLanguageImageFunctions']
     Symfony\Component\ExpressionLanguage\ExpressionLanguage: '@App\Service\Expression\ExpressionLanguage'

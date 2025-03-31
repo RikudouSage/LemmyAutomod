@@ -54,6 +54,11 @@ final readonly class ExpressionLanguageFunctions extends AbstractExpressionLangu
                 $this->uncompilableFunction(),
                 $this->notifyFunction(...),
             ),
+            new ExpressionFunction(
+                'todo',
+                $this->uncompilableFunction(),
+                fn () => true,
+            )
         ];
     }
 
