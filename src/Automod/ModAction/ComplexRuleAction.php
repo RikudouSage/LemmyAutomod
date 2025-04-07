@@ -11,6 +11,7 @@ use App\Enum\RunConfiguration;
 use App\Repository\ComplexRuleRepository;
 use App\Service\Expression\ExpressionLanguage;
 use App\Service\Expression\ExpressionLanguageNotifier;
+use Psr\Log\LoggerInterface;
 use Rikudou\LemmyApi\Response\Model\Community;
 use Rikudou\LemmyApi\Response\Model\Person;
 use Rikudou\LemmyApi\Response\View\CommentReportView;
@@ -30,6 +31,7 @@ final readonly class ComplexRuleAction implements ModAction
         private ComplexRuleRepository $ruleRepository,
         private ExpressionLanguage $expressionLanguage,
         private ExpressionLanguageNotifier $notifier,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -70,6 +72,7 @@ final readonly class ComplexRuleAction implements ModAction
             if (!$this->expressionLanguage->evaluate($ruleExpression, ['object' => $object])) {
                 continue;
             }
+            $this->logger->debug("Running complex rule with id '{$rule->getId()}'");
             $expression = $rule->getActions();
             try {
                 $result = (bool) $this->expressionLanguage->evaluate($expression, [
