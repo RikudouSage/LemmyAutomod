@@ -95,7 +95,11 @@ final readonly class ImageFetcher
             return $cacheItem->get();
         }
 
-        $response = $this->httpClient->request(Request::METHOD_GET, $url);
+        $response = $this->httpClient->request(Request::METHOD_GET, $url, [
+            'headers' => [
+                'Accept' => 'image/*',
+            ],
+        ]);
         if ($response->getStatusCode() < 200 || $response->getStatusCode() >= 300 || strlen($response->getContent()) > $this->maxSize) {
             $cacheItem->set(null);
         } else {
