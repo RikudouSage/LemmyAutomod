@@ -17,6 +17,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^2.17",
         "league/commonmark": "^2.4",
+        "nelmio/cors-bundle": "^2.5",
         "nyholm/psr7": "^1.8",
         "php-http/discovery": "^1.18",
         "phpdocumentor/reflection-docblock": "^5.3",

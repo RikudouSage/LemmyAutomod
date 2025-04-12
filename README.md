@@ -563,6 +563,7 @@ Here is a list of environment variables and their descriptions:
 | REMOVAL_LOG_VALIDITY          | The amount of time to keep logs of removals, which are used to restore posts. Default is 24 hours.                                                                                                                                                                   |
 | FEDISEER_API_KEY              | API key for fediseer.com, used to automatically create a censure on Fediseer when an instance is defederated by the automod. See [**4.8.5** Sync defederations to Fediseer censures](#495-sync-defederations-to-fediseer-censures).                                  |
 | MANAGEMENT_API_ENABLED        | Whether the management api should be enabled or not (more on the api below).                                                                                                                                                                                         |
+| CORS_ALLOW_ORIGIN             | The regex to use for CORS, by default it doesn't allow any.                                                                                                                                                                                                          |
 
 
 ### Lemmy authentication mode
@@ -667,6 +668,8 @@ resource names and camelCase for property names).
 
 To enable the api, you must set the `MANAGEMENT_API_ENABLED` environment variable to `1`, otherwise all the endpoints
 will return the not found status code.
+
+> If you want to access the api from a JS website, don't forget to enable CORS using the `CORS_ALLOW_ORIGIN` env variable
 
 After it's enabled, simply visit `/api` in your browser/Postman/whatever, and you will be presented with a list of
 available resources. The api itself uses the [`JSON:API` v1.0 standard](https://jsonapi.org/format/1.0/) and is fairly
