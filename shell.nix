@@ -2,8 +2,7 @@
 pkgs.mkShell {
     nativeBuildInputs = with pkgs.buildPackages;
     let
-        unstable = import (builtins.fetchTarball https://github.com/nixos/nixpkgs/tarball/master) {};
-        php84 = unstable.php84.buildEnv {
+        php84 = pkgs.php84.buildEnv {
             extensions = ({ enabled, all }: enabled ++ (with all; [
                 ctype
                 iconv
