@@ -53,7 +53,7 @@ final readonly class BanUserForImageAction extends AbstractModAction
         }
         if (
             !count($this->imageRepository->findBy(['enabled' => true]))
-            && !count($this->qrCodeRepository->findAll())
+            && !count($this->qrCodeRepository->findBy(['enabled' => true]))
         ) {
             return false;
         }
