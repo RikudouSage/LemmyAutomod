@@ -24,6 +24,7 @@ Other features:
     * [**2.2** Export YAML](#22-export-yaml)
     * [**2.3** Import webhooks](#23-import-webhooks)
     * [**2.4** Signed webhooks](#24-signed-webhooks)
+    * [**2.5** User interface](#25-user-interface)
   * [3. Notification setup (optional)](#3-notification-setup-optional)
     * [**3.1**  Private message on Lemmy](#31-private-message-on-lemmy)
     * [**3.2** Post to chat room on Matrix](#32-post-to-chat-room-on-matrix)
@@ -149,6 +150,11 @@ configuration which you can then import.
 > first generate the key and then run the `app:dump` command with manually provided `EXPECTED_SIGNATURE_KEY` env
 > variable. That way, the export will contain the signing key, but automod will still work without it. After you import
 > the new config to Lemmy Webhook, you can come back and set the signing key for the whole automod.
+
+### **2.5** User interface
+
+Since version 2.20.0, the Automod supports the [official GUI](https://github.com/RikudouSage/LemmyAutomodManager).
+Follow the instructions in the GUI repository to install it.
 
 ## 3. Notification setup (optional)
 
