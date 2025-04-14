@@ -25,19 +25,19 @@ class InstanceDefederationRule
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $software = null;
 
-    #[ApiProperty]
+    #[ApiProperty(getter: 'allowsOpenRegistrations')]
     #[ORM\Column(nullable: true)]
     private ?bool $allowOpenRegistrations = null;
 
-    #[ApiProperty]
+    #[ApiProperty(getter: 'allowsOpenRegistrationsWithCaptcha')]
     #[ORM\Column(nullable: true)]
     private ?bool $allowOpenRegistrationsWithCaptcha = null;
 
-    #[ApiProperty]
+    #[ApiProperty(getter: 'allowsOpenRegistrationsWithEmailVerification')]
     #[ORM\Column(nullable: true)]
     private ?bool $allowOpenRegistrationsWithEmailVerification = null;
 
-    #[ApiProperty]
+    #[ApiProperty(getter: 'allowsOpenRegistrationsWithApplication')]
     #[ORM\Column(nullable: true)]
     private ?bool $allowOpenRegistrationsWithApplication = null;
 
@@ -79,7 +79,7 @@ class InstanceDefederationRule
         return $this->allowOpenRegistrationsWithCaptcha;
     }
 
-    public function setAllowOpenRegistrationsWithCaptcha(bool $allowOpenRegistrationsWithCaptcha): static
+    public function setAllowOpenRegistrationsWithCaptcha(?bool $allowOpenRegistrationsWithCaptcha): static
     {
         $this->allowOpenRegistrationsWithCaptcha = $allowOpenRegistrationsWithCaptcha;
 
@@ -91,7 +91,7 @@ class InstanceDefederationRule
         return $this->allowOpenRegistrations;
     }
 
-    public function setAllowOpenRegistrations(bool $allowOpenRegistrations): static
+    public function setAllowOpenRegistrations(?bool $allowOpenRegistrations): static
     {
         $this->allowOpenRegistrations = $allowOpenRegistrations;
 
@@ -103,7 +103,7 @@ class InstanceDefederationRule
         return $this->allowOpenRegistrationsWithEmailVerification;
     }
 
-    public function setAllowOpenRegistrationsWithEmailVerification(bool $allowOpenRegistrationsWithEmailVerification): static
+    public function setAllowOpenRegistrationsWithEmailVerification(?bool $allowOpenRegistrationsWithEmailVerification): static
     {
         $this->allowOpenRegistrationsWithEmailVerification = $allowOpenRegistrationsWithEmailVerification;
 
