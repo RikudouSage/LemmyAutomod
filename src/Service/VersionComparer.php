@@ -10,10 +10,10 @@ final readonly class VersionComparer
             return 0;
         }
         if ($left === 'dev') {
-            return -1;
+            return 1;
         }
         if ($right === 'dev') {
-            return 1;
+            return -1;
         }
 
         return version_compare($left, $right);
