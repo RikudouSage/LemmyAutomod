@@ -28,7 +28,7 @@ class InstanceDefederationRuleRepository extends ServiceEntityRepository
     {
         $builder = $this->createQueryBuilder('idr');
         if ($software === null) {
-            $builder->andWhere('idr.idr.software is null');
+            $builder->andWhere('idr.software is null');
         } else {
             $builder
                 ->andWhere('idr.software = :software or idr.software is null')
