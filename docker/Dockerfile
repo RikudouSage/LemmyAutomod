@@ -36,7 +36,7 @@ RUN curl https://getcomposer.org/installer -o /tmp/composer-installer && \
 COPY --chown=33:33 . /var/www/html
 
 ARG APP_VERSION=dev
-RUN echo $APP_VERSION >> .env.local
+RUN echo APP_VERSION=$APP_VERSION >> .env.local
 
 RUN curl https://getcomposer.org/installer -o /tmp/composer-installer && \
     php /tmp/composer-installer && \
