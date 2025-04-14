@@ -37,8 +37,8 @@ final class VersionCheckController extends AbstractController
             'latestUiVersion' => $latestUiVersion,
             'currentApiVersion' => $currentApiVersion,
             'latestApiVersion' => $latestApiVersion,
-            'newUiVersionAvailable' => $versionComparer->compare($currentUiVersion, $latestUiVersion) === 1,
-            'newApiVersionAvailable' => $versionComparer->compare($currentApiVersion, $latestApiVersion) === 1,
+            'newUiVersionAvailable' => $versionComparer->compare($currentUiVersion, $latestUiVersion) === -1,
+            'newApiVersionAvailable' => $versionComparer->compare($currentApiVersion, $latestApiVersion) === -1,
         ]);
     }
 }
