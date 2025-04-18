@@ -41,4 +41,14 @@ final class VersionCheckController extends AbstractController
             'newApiVersionAvailable' => $versionComparer->compare($currentApiVersion, $latestApiVersion) === -1,
         ]);
     }
+
+    #[Route('/api-version', name: 'api.version_check.api_version', methods: [Request::METHOD_GET])]
+    public function apiVersion(
+        #[Autowire('%app.version%')]
+        string $currentApiVersion,
+    ): JsonResponse {
+        return new JsonResponse([
+            'version' => $currentApiVersion,
+        ]);
+    }
 }
