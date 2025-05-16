@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Stamp\DelayStamp;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/triggers')]
@@ -87,7 +88,9 @@ final class TriggerController extends AbstractController
         #[MapRequestPayload] TriggerIdRequest $request,
         MessageBusInterface $messageBus,
     ): JsonResponse {
-        $messageBus->dispatch(new AnalyzeRegistrationApplicationMessage($request->id));
+        $messageBus->dispatch(new AnalyzeRegistrationApplicationMessage($request->id), [
+            new DelayStamp(15_000),
+        ]);
         return new JsonResponse(status: Response::HTTP_NO_CONTENT);
     }
 
