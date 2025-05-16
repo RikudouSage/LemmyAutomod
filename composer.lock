@@ -3667,16 +3667,16 @@
         },
         {
             "name": "rikudou/lemmy-api",
-            "version": "v0.8.3",
+            "version": "v0.8.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RikudouSage/LemmyApi.git",
-                "reference": "ce8d51f4aa5c8fedbd3c1e54cc316a39bc08e74d"
+                "reference": "d3e6fd1dd4442b4d74121a18138fd08aa7da637a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RikudouSage/LemmyApi/zipball/ce8d51f4aa5c8fedbd3c1e54cc316a39bc08e74d",
-                "reference": "ce8d51f4aa5c8fedbd3c1e54cc316a39bc08e74d",
+                "url": "https://api.github.com/repos/RikudouSage/LemmyApi/zipball/d3e6fd1dd4442b4d74121a18138fd08aa7da637a",
+                "reference": "d3e6fd1dd4442b4d74121a18138fd08aa7da637a",
                 "shasum": ""
             },
             "require": {
@@ -3710,9 +3710,9 @@
             "description": "Communicate with Lemmy API from php",
             "support": {
                 "issues": "https://github.com/RikudouSage/LemmyApi/issues",
-                "source": "https://github.com/RikudouSage/LemmyApi/tree/v0.8.3"
+                "source": "https://github.com/RikudouSage/LemmyApi/tree/v0.8.6"
             },
-            "time": "2025-02-08T15:57:08+00:00"
+            "time": "2025-05-16T08:57:21+00:00"
         },
         {
             "name": "rikudou/reflection-file",
