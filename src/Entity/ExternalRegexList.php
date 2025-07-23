@@ -34,6 +34,7 @@ class ExternalRegexList
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $append = null;
 
+    #[ApiProperty]
     #[ORM\Column(length: 180, unique: true)]
     private ?string $name = null;
 
