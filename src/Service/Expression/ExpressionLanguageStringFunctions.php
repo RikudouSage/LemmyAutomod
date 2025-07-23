@@ -19,6 +19,11 @@ final readonly class ExpressionLanguageStringFunctions extends AbstractExpressio
                 $this->uncompilableFunction(),
                 $this->httpHost(...),
             ),
+            new ExpressionFunction(
+                'matches_any',
+                $this->uncompilableFunction(),
+                $this->matchesAny(...),
+            )
         ];
     }
 
@@ -30,5 +35,19 @@ final readonly class ExpressionLanguageStringFunctions extends AbstractExpressio
     private function httpHost(array $context, string $url): string
     {
         return parse_url($url, PHP_URL_HOST);
+    }
+
+    /**
+     * @param array<string> $regexes
+     */
+    private function matchesAny(array $context, string $string, array $regexes): bool
+    {
+        return array_any(
+            $regexes,
+            fn (string $regex): bool => preg_match(
+                '#' . str_replace('#', '\\#', $regex) . '#',
+                $string,
+            ),
+        );
     }
 }

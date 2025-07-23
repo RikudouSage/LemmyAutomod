@@ -105,6 +105,8 @@ final class TriggerJobCommand extends Command
                     $value = $value === 'true';
                 } else if (class_exists($type) && is_string($value) && is_array(json_decode($value, true))) {
                     $value = $this->createInstance($type, json_decode($value, true));
+                } else if ($type === 'array') {
+                    $value = json_decode($value, true);
                 }
 
                 $namedParameters ? ($args[$argument->getName()] = $value) : ($args[$i] = $value);
