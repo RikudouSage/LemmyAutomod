@@ -105,4 +105,5 @@ services:
             - registerProvider: ['@App\Service\Expression\ExpressionLanguageMarkdownFunctions']
             - registerProvider: ['@App\Service\Expression\ExpressionLanguageArrayFunctions']
             - registerProvider: ['@App\Service\Expression\ExpressionLanguageImageFunctions']
+            - registerProvider: ['@App\Service\Expression\ExternalRegexListFunctions']
     Symfony\Component\ExpressionLanguage\ExpressionLanguage: '@App\Service\Expression\ExpressionLanguage'
