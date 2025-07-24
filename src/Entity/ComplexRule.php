@@ -20,7 +20,7 @@ class ComplexRule
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ApiProperty]
+    #[ApiProperty(setter: 'setTypeAsString')]
     #[ORM\Column(length: 180, enumType: ComplexRuleType::class)]
     private ?ComplexRuleType $type = null;
 
@@ -32,7 +32,7 @@ class ComplexRule
     #[ORM\Column(type: Types::TEXT)]
     private ?string $actions = null;
 
-    #[ApiProperty]
+    #[ApiProperty(setter: 'setRunConfigurationAsString')]
     #[ORM\Column(length: 180, enumType: RunConfiguration::class, options: ['default' => RunConfiguration::WhenNotAborted->value])]
     private RunConfiguration $runConfiguration = RunConfiguration::WhenNotAborted;
 
@@ -55,6 +55,11 @@ class ComplexRule
         $this->type = $type;
 
         return $this;
+    }
+
+    public function setTypeAsString(string $type): static
+    {
+        return $this->setType(ComplexRuleType::from($type));
     }
 
     public function getRule(): ?string
@@ -91,6 +96,11 @@ class ComplexRule
         $this->runConfiguration = $runConfiguration;
 
         return $this;
+    }
+
+    public function setRunConfigurationAsString(string $runConfiguration): static
+    {
+        return $this->setRunConfiguration(RunConfiguration::from($runConfiguration));
     }
 
     public function isEnabled(): bool
