@@ -109,6 +109,7 @@ final readonly class ImageFetcher
                 $filepath = tempnam(sys_get_temp_dir(), 'lemmy_automod');
                 file_put_contents($filepath, $response->getContent());
                 $isImage = str_starts_with($this->typeGuesser->guessMimeType($filepath), 'image/');
+                unlink($filepath);
             }
             if ($isImage) {
                 try {
