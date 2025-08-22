@@ -11,6 +11,9 @@ EXPOSE 80
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf && \
     sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
+RUN apt-get update && \
+    apt-get -y install supervisor tini unzip && \
+    rm -rf /var/lib/apt/lists/*
 RUN install-php-extensions gd intl opcache pcntl pdo pdo_pgsql redis
 RUN a2enmod rewrite
 
