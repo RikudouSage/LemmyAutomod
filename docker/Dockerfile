@@ -1,5 +1,7 @@
 FROM php:8.4-apache
 
+COPY --from=ghcr.io/mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
+
 ENV APP_ENV prod
 ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 ENV DATABASE_DIR /opt/database
@@ -9,13 +11,7 @@ EXPOSE 80
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf && \
     sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
 
-RUN apt-get update && \
-    apt-get -y install libjpeg-dev libonig-dev libpng-dev libpq-dev libwebp-dev libxml2-dev supervisor tini unzip zlib1g-dev && \
-    rm -rf /var/lib/apt/lists/*
-RUN docker-php-ext-configure gd --with-webp --with-jpeg && \
-    docker-php-ext-install gd intl opcache pcntl pdo pdo_pgsql && \
-    pecl install redis-6.1.0 && \
-    docker-php-ext-enable redis
+RUN install-php-extensions gd intl opcache pcntl pdo pdo_pgsql redis
 RUN a2enmod rewrite
 
 WORKDIR /var/www/html
