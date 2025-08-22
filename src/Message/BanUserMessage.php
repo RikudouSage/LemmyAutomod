@@ -2,6 +2,7 @@
 
 namespace App\Message;
 
+use DateInterval;
 use Rikudou\LemmyApi\Response\Model\Person;
 
 final readonly class BanUserMessage
@@ -11,6 +12,7 @@ final readonly class BanUserMessage
         public string $reason,
         public bool $removePosts,
         public bool $removeComments,
+        public ?DateInterval $duration = null,
     ) {
     }
 }
