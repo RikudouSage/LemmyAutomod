@@ -40,7 +40,6 @@
         "symfony/property-access": "^7.0",
         "symfony/property-info": "^7.0",
         "symfony/psr-http-message-bridge": "^7.0",
-        "symfony/rate-limiter": "7.2.*",
         "symfony/redis-messenger": "^7.0",
         "symfony/runtime": "^7.0",
         "symfony/serializer": "^7.0",
