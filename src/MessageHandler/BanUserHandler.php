@@ -5,6 +5,7 @@ namespace App\MessageHandler;
 use App\Message\BanUserMessage;
 use App\Message\RemoveCommentMessage;
 use App\Message\RemovePostMessage;
+use DateTimeImmutable;
 use Rikudou\LemmyApi\Enum\SortType;
 use Rikudou\LemmyApi\LemmyApi;
 use Rikudou\LemmyApi\Response\Model\Person;
@@ -23,7 +24,17 @@ final readonly class BanUserHandler
 
     public function __invoke(BanUserMessage $message): void
     {
-        $this->api->admin()->banUser(user: $message->user, reason: $message->reason, removeData: false);
+        $expires = null;
+        if ($message->duration) {
+            $expires = new DateTimeImmutable()->add($message->duration);
+        }
+
+        $this->api->admin()->banUser(
+            user: $message->user,
+            expires: $expires,
+            reason: $message->reason,
+            removeData: false,
+        );
         if ($message->removePosts) {
             $this->deletePostsFederated($message->user);
         }

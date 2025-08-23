@@ -38,6 +38,13 @@ parameters:
     app.signature.key: '%env(EXPECTED_SIGNATURE_KEY)%'
     app.log_level: '%env(LOG_LEVEL)%'
 
+    app.rate_limit.comments: '%env(int:RATE_LIMIT_COMMENTS)%'
+    app.rate_limit.posts: '%env(int:RATE_LIMIT_POSTS)%'
+    app.rate_limit.period: '%env(interval:RATE_LIMIT_PERIOD)%'
+    app.rate_limit.ban_duration: '%env(interval:RATE_LIMIT_BAN_DURATION)%'
+    app.rate_limit.use_cache: '%env(bool:RATE_LIMIT_USE_CACHE)%'
+    app.rate_limit.remove_content: '%env(bool:RATE_LIMIT_REMOVE_CONTENT)%'
+
 services:
     # default configuration for services in *this* file
     _defaults:
