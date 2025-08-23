@@ -5,6 +5,7 @@ namespace App\Automod\ModAction\RateLimit;
 use App\Automod\ModAction\AbstractModAction;
 use App\Context\Context;
 use App\Enum\FurtherAction;
+use App\Enum\RunConfiguration;
 use Doctrine\Common\Cache\Psr6\CacheItem;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -30,6 +31,11 @@ final readonly class RateLimitCacheHandler extends AbstractModAction
         private bool $useCache,
         private CacheItemPoolInterface $cache,
     ) {
+    }
+
+    public function getRunConfiguration(): RunConfiguration
+    {
+        return RunConfiguration::Always;
     }
 
     public function shouldRun(object $object): bool
