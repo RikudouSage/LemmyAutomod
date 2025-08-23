@@ -3,6 +3,7 @@
 namespace App\Service\Expression;
 
 use App\Service\ExternalRegexListManager;
+use Rikudou\Iterables\RewindableGenerator;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
 final readonly class ExternalRegexListFunctions extends AbstractExpressionLanguageFunctionProvider
@@ -23,15 +24,14 @@ final readonly class ExternalRegexListFunctions extends AbstractExpressionLangua
         ];
     }
 
-    private function fetchExternalLists(array $context, string ...$listNames): array
+    private function fetchExternalLists(array $context, string ...$listNames): iterable
     {
-        $result = [];
-        foreach ($listNames as $listName) {
-            $result = [...$result, ...$this->externalRegexListManager->getList(
-                $this->externalRegexListManager->findByName($listName),
-            )];
-        }
-
-        return $result;
+        return new RewindableGenerator(function () use ($listNames) {
+            foreach ($listNames as $listName) {
+                yield from $this->externalRegexListManager->getList(
+                    $this->externalRegexListManager->findByName($listName),
+                );
+            }
+        });
     }
 }

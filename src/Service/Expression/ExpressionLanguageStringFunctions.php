@@ -2,6 +2,7 @@
 
 namespace App\Service\Expression;
 
+use Rikudou\Iterables\Iterables;
 use Symfony\Component\ExpressionLanguage\ExpressionFunction;
 
 final readonly class ExpressionLanguageStringFunctions extends AbstractExpressionLanguageFunctionProvider
@@ -38,11 +39,11 @@ final readonly class ExpressionLanguageStringFunctions extends AbstractExpressio
     }
 
     /**
-     * @param array<string> $regexes
+     * @param iterable<string> $regexes
      */
-    private function matchesAny(array $context, string $string, array $regexes): bool
+    private function matchesAny(array $context, string $string, iterable $regexes): bool
     {
-        return array_any(
+        return Iterables::any(
             $regexes,
             fn (string $regex): bool => preg_match(
                 '#' . str_replace('#', '\\#', $regex) . '#',
